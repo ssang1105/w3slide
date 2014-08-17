@@ -38,14 +38,14 @@ var io = socketio.listen(server);
 io.set('log level', 1);
 
 var UserSchema = new mongoose.Schema({
-    provider : String,
-    id : String,
-    username: String,
-    email: { type : String , lowercase : true},
-    projectList : [String],
-    profilePicture : String,
+        provider : String,
+        id : String,
+        username: String,
+        email: { type : String , lowercase : true},
+        projectList : [String],
+        profilePicture : String,
         projectNum : Number
-}
+    }
 );
 var PPTSchema = new mongoose.Schema({
     fileName : String,
@@ -58,7 +58,8 @@ var PPTSchema = new mongoose.Schema({
     createdDate : Date,
     pptContents : String,
     thumbnail : String,
-    id : String
+    id : String,
+    url : String
 })
 
 var PPTs = mongoose.model('ppts', PPTSchema);
@@ -71,15 +72,15 @@ if (process.env.NODE_ENV === 'development') {
 
 passport.use(new GoogleStrategy({
         /*
-           https://code.google.com/apis/console/b/0/?noredirect#project:798570766353:access 에서 세팅
+         https://code.google.com/apis/console/b/0/?noredirect#project:798570766353:access 에서 세팅
          */
         clientID: '798570766353-grel6lkpudf677bj7plabec6u799oeq5.apps.googleusercontent.com',
         clientSecret: 'HgNuWAGmURXrDZs2TsuRQ9V7',
         callbackURL: 'http://localhost:3000/auth/google/callback',
         scope: [
-           'https://www.googleapis.com/auth/plus.login',
-           'https://www.googleapis.com/auth/userinfo.email'
-           ]
+            'https://www.googleapis.com/auth/plus.login',
+            'https://www.googleapis.com/auth/userinfo.email'
+        ]
     },
     function(accessToken, refreshToken, profile, done) {
         Users.findOne({ id: profile.id }, function (err, oldUser) {
@@ -104,7 +105,7 @@ passport.use(new GoogleStrategy({
 
 passport.use(new FacebookStrategy({
         /*
-            https://developers.facebook.com/apps/698552830212995/settings/ 에서 세
+         https://developers.facebook.com/apps/698552830212995/settings/ 에서 세
          */
         clientID :'698552830212995',
         clientSecret : 'c28eb14acf960f3e912086a6dddd9f7d',
@@ -112,23 +113,23 @@ passport.use(new FacebookStrategy({
         profileFields: ['id', 'displayName', 'link', 'photos', 'emails']
     },
     function(accessToken, refreshToken, profile, done) {
-         Users.findOne({id:profile.id}, function(err, oldUser){
-             if(oldUser){
-                 done(null,oldUser);
-             }else{
-                 var newUser = new Users({
-                     provider : 'Facebook',
-                     id : profile.id,
-                     username: profile.displayName,
-                     email: profile.emails[0].value,
-                     profilePicture : profile.photos[0].value,
-                     projectNum:0
-                 }).save(function(err,newUser){
-                     if(err) throw err;
-                     done(null, newUser);
-                 });
-             }
-         });
+        Users.findOne({id:profile.id}, function(err, oldUser){
+            if(oldUser){
+                done(null,oldUser);
+            }else{
+                var newUser = new Users({
+                    provider : 'Facebook',
+                    id : profile.id,
+                    username: profile.displayName,
+                    email: profile.emails[0].value,
+                    profilePicture : profile.photos[0].value,
+                    projectNum:0
+                }).save(function(err,newUser){
+                        if(err) throw err;
+                        done(null, newUser);
+                    });
+            }
+        });
     }
 ))
 
@@ -146,8 +147,8 @@ passport.deserializeUser(function(user,done){
 app.get('/auth/google', passport.authenticate('google'))
 app.get('/auth/google/callback',
     passport.authenticate('google', {
-        successRedirect: '/login_success',
-        failureRedirect: '/login_fail'
+            successRedirect: '/login_success',
+            failureRedirect: '/login_fail'
         }
 
     ));
@@ -174,6 +175,7 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/');
 }
 
+
 mongoose.connect('mongodb://localhost/mydb',function(err){
     if(err){
         console.log('mongoose connection error :'+err);
@@ -197,10 +199,10 @@ io.sockets.on('connection', function (socket) {
         })
 
     });
-    socket.on('newSlides', function(slidePic, slideName, user){
+    socket.on('newSlides', function(pptURL, pptImg, pptName, user){
         console.log('New Slides')
         var newSlides = new PPTs({
-            fileName : slideName,
+            fileName : pptName,
             members : {
                 name : user.username,
                 profilePicture: user.profilePicture,
@@ -209,16 +211,17 @@ io.sockets.on('connection', function (socket) {
             },
             createdDate : Date.now(),
             pptContents : null,
-            thumbnail : slidePic,
-            id : user.id+slideName+user.projectNum
-        }).save(function(err,newUser){
+            thumbnail : pptImg,
+            id : user.id+user.projectNum+pptName,
+            url : pptURL
+        });
+        newSlides.members.push({ name : user.username, profilePicture:user.profilePicture, email:user.email, id:user.id})
+        newSlides.save(function(err,newSlides){
                 if(err) throw err;
-            });
-
+            })
         Users.findOne({'id':user.id},function(err,user){
-            PPTs.findOne({'id':user.id+slideName+user.projectNum},function(err,ppt){
+            PPTs.findOne({'id':user.id+user.projectNum+pptName},function(err,ppt){
                 if(err){
-                    console.err(err);
                     throw err;
                 }
                 console.log(ppt)
@@ -228,16 +231,23 @@ io.sockets.on('connection', function (socket) {
                 });
             });
         });
-
+        app.get('/'+pptURL, ensureAuthenticated, function(req, res){
+            res.render('slide');
+        });
     })
 
     socket.on('getUsersPPT',function(userID){
         Users.findOne({'id':userID},function(err,user){
             for(var i=0; i<user.projectList.length; i++){
                 PPTs.findOne({'id':user.projectList[i]},function(err,ppt){
-                   socket.emit('userPPT', ppt)
+                    socket.emit('userPPT', ppt)
                 });
             }
+        });
+    });
+    socket.on('makeSlide',function(pptURL){
+        app.get('/'+pptURL, function(req, res){
+            res.render('slide');
         });
     });
 

@@ -9,19 +9,21 @@ $(document).ready(function(){
         btn_uploadPPT = $('#uploadPPT'),
         pptLists = $('#pptLists'),
         socket = io.connect('http://localhost:3000/'),
-        userID = $('.profilePicture')[0].id,
-        userSlide = $('.userSlide')
+        userID = $('.profilePicture')[0].id;
 
     win.load(function(){
-        console.log('win.onload')
-
-        // userID를 보내서 사용자의 PPT 아이디 갯수만큼 리스트들의 정보를 가져와. 이를 Append
-
         socket.emit('getUsersPPT', userID);
         socket.on('userPPT', function(ppt){
-            var existingSlides = '<div class="userSlide" style="float:left;"><a href="#"><img src="'+ ppt.thumbnail+'" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false">' +
-                '<div><div style="margin-left:30px;"></div><div style="margin-left: 30px">'+ ppt.fileName+'</div></a>';
-            pptLists.append(existingSlides)
+            // 불러올 PPT가 있을 경우에
+            console.log(ppt.url)
+            if(ppt)
+                var existingSlides = '<div class="userSlide" id='+ppt.url+' style="float:left;"><a href="#"><img src="'+ ppt.thumbnail+'" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false">' +
+                    '<div><div style="margin-left:30px;"></div><div style="margin-left: 30px">'+ ppt.fileName+'</div></a>';
+            pptLists.append(existingSlides);
+            $('#'+ppt.url).click(function(e){
+                socket.emit('makeSlide',ppt.url);
+            })
+
         });
     });
 
@@ -39,12 +41,14 @@ $(document).ready(function(){
         return false;
     });
 
+
+
     btn_uploadPPT.click(function(){
-        console.log('asdfa');
+        console.log('file upload');
         // 파일 업로드
         // pptx 파일만 선택 가능하도록
         // pptLists.append
-        // 서버에 DB 저장 요
+        // 서버에 DB 저장 요청
         popup.hide();
         overlay.appendTo(document.body).remove();
     });
@@ -55,22 +59,37 @@ $(document).ready(function(){
         overlay.appendTo(document.body).remove();
     });
 
-    userSlide.click(function(){
-        console.log('asd');
-    })
+
 
     socket.on('slideInfo',function(user){
         // 나중에는 PPT 미리보기가 가능하게 하기위해서 이미지 SRC를 PPT Schema에서 PPT 썸네일 가져와야겠다.
-        var newSlide = '<div class="userSlide" id="slide'+user.projectNum+'" style="float:left;"><a href="#"><img src="../assets/image/index/samplePPT.png" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false">' +
-            '<div><input class="slideName" type="text" value="Enter the name"><div style="margin-left:30px;" id="slideSub'+user.projectNum+'"></div></div></a>';
+        var newSlide = '<div class="userSlide" id='+makeid()+' style="float:left;"><a href="#"><img src="../assets/image/index/samplePPT.png" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false"><div>' +
+            '<input class="slideName" type="text" value="Enter the name"><div style="margin-left:30px;" id="slideName'+user.projectNum+'"></div></div></a>';
         pptLists.append(newSlide);
         $('.slideName').focus().keypress(function(e) {
-            if(e.which === 13) $(this).blur();
-        }).blur(function(e) {
-                $('#slideSub'+user.projectNum).text($('.slideName').val());
+            if(e.which === 13) {
+                $('#slideName'+user.projectNum).text($(this).val());
                 $('.slideName').css({ display : 'none'});
-                socket.emit('newSlides', $('.userSlide a img').attr('src'), $('#slideSub'+user.projectNum).text(), user);
+                var pptURL = $(this).parents()[2].id,
+                    pptImg = $('.userSlide a img').attr('src'),
+                    pptName = $('#slideName'+user.projectNum).text();
+                $('#'+pptURL).click(function(e){
+                    console.log(pptURL)
+                })
+                socket.emit('newSlides', pptURL, pptImg, pptName, user);
+                $(this).blur();
+            }
         });
 
     });
+
+
 });
+
+function makeid()  {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
