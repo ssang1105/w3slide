@@ -65,7 +65,10 @@
         <entry file="file://$PROJECT_DIR$/assets/js/index.js">
           <provider selected="true" editor-type-id="text-editor">
             <state line="7" column="13" selection-start="192" selection-end="192" vertical-scroll-proportion="0.16535433" vertical-offset="0" max-vertical-offset="635">
-              <folding />
+              <folding>
+                <marker date="1408289845000" expanded="true" signature="28:333" placeholder="{...}" />
+                <marker date="1408289845000" expanded="true" signature="143:329" placeholder="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -79,6 +82,8 @@
                 <marker date="1408268571000" expanded="true" signature="780:838" placeholder="..." />
                 <marker date="1408268571000" expanded="true" signature="896:913" placeholder="..." />
                 <marker date="1408268571000" expanded="true" signature="933:950" placeholder="..." />
+                <marker date="1408268571000" expanded="true" signature="1817:1852" placeholder="{...}" />
+                <marker date="1408268571000" expanded="true" signature="1895:2819" placeholder="{...}" />
                 <marker date="1408268571000" expanded="true" signature="2056:2067" placeholder="..." />
                 <marker date="1408268571000" expanded="true" signature="2135:2193" placeholder="..." />
                 <marker date="1408268571000" expanded="true" signature="2307:2324" placeholder="..." />
@@ -392,7 +397,10 @@
     <entry file="file://$PROJECT_DIR$/assets/js/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="8" selection-start="257" selection-end="257" vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="300">
-          <folding />
+          <folding>
+            <marker date="1408289845000" expanded="true" signature="28:333" placeholder="{...}" />
+            <marker date="1408289845000" expanded="true" signature="143:329" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -404,6 +412,8 @@
             <marker date="1408268571000" expanded="true" signature="780:838" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="896:913" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="933:950" placeholder="..." />
+            <marker date="1408268571000" expanded="true" signature="1817:1852" placeholder="{...}" />
+            <marker date="1408268571000" expanded="true" signature="1895:2819" placeholder="{...}" />
             <marker date="1408268571000" expanded="true" signature="2056:2067" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="2135:2193" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="2307:2324" placeholder="..." />
@@ -444,7 +454,10 @@
     <entry file="file://$PROJECT_DIR$/assets/js/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="8" selection-start="257" selection-end="257" vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="300">
-          <folding />
+          <folding>
+            <marker date="1408289845000" expanded="true" signature="28:333" placeholder="{...}" />
+            <marker date="1408289845000" expanded="true" signature="143:329" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -456,6 +469,8 @@
             <marker date="1408268571000" expanded="true" signature="780:838" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="896:913" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="933:950" placeholder="..." />
+            <marker date="1408268571000" expanded="true" signature="1817:1852" placeholder="{...}" />
+            <marker date="1408268571000" expanded="true" signature="1895:2819" placeholder="{...}" />
             <marker date="1408268571000" expanded="true" signature="2056:2067" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="2135:2193" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="2307:2324" placeholder="..." />
@@ -496,7 +511,10 @@
     <entry file="file://$PROJECT_DIR$/assets/js/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="31" column="32" selection-start="845" selection-end="845" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1230">
-          <folding />
+          <folding>
+            <marker date="1408289845000" expanded="true" signature="28:333" placeholder="{...}" />
+            <marker date="1408289845000" expanded="true" signature="143:329" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -598,6 +616,8 @@
             <marker date="1408268571000" expanded="true" signature="780:838" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="896:913" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="933:950" placeholder="..." />
+            <marker date="1408268571000" expanded="true" signature="1817:1852" placeholder="{...}" />
+            <marker date="1408268571000" expanded="true" signature="1895:2819" placeholder="{...}" />
             <marker date="1408268571000" expanded="true" signature="2056:2067" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="2135:2193" placeholder="..." />
             <marker date="1408268571000" expanded="true" signature="2307:2324" placeholder="..." />
@@ -638,7 +658,10 @@
     <entry file="file://$PROJECT_DIR$/assets/js/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="7" column="13" selection-start="192" selection-end="192" vertical-scroll-proportion="0.16535433" vertical-offset="0" max-vertical-offset="635">
-          <folding />
+          <folding>
+            <marker date="1408289845000" expanded="true" signature="28:333" placeholder="{...}" />
+            <marker date="1408289845000" expanded="true" signature="143:329" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
