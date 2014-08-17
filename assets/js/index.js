@@ -5,6 +5,7 @@ $(document).ready(function(){
         logo = $('#logo')
     win.load(function(){
         console.log('win.onload')
+        console.log('tset')
         logo.css({
             left:win.innerWidth()/2-logo.width()/2
         })
