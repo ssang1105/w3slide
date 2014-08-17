@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>W3 Slides </title>
+    <script type="text/javascript" src="http://localhost:3000/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.js"></script>
+    <script src="../assets/js/index.js"></script>
+    <script src="../assets/js/success_login.js"></script>
+    <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body>
+
+<header>
+    <div id="logo"><a href><img src="../assets/image/index/logo.png" style="width:60%"></a></div>
+    <div style="float: right;  background: #969696; min-width: 190px; max-height: 48px">
+        <p id="namespace"><%=namespace%></p>
+        <img src='<%=profileImage%>' id="<%=userID%>" class="profilePicture"></div>
+    </div>
+
+</header>
+
+
+<div class='popup'>
+    <div class='content'>
+        <h3>Lorem ipsum dolor sit amet, consectetur adipisicing elit,</h3>
+        <img src='../assets/image/index/x.png' alt='quit' class='x' id='x' />
+        <a href="#"><img src='../assets/image/index/uploadPPT.png'  id="uploadPPT" class="newSlide" style="margin-left:20px; width: 40%;" /></a>
+        <a href="#"><img src='../assets/image/index/createPPT.png'  id="createPPT" class="newSlide" style="margin-left:5px; width: 40%;" /></a>
+    </div>
+</div>
+<div id="createSlides"><a href><img id="createSlidesBtn" src="assets/image/index/newSlides.png" style="width: 30%"></a></div>
+<div id="pptLists">
+    <!--will be added by 'create new slides'-->
+</div>
+
+
+</body>
+</html>
+

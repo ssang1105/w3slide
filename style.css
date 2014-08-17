@@ -1,0 +1,129 @@
+/*
+    . -> class
+    # -> id
+*/
+
+header{
+    background-color: #494949;
+    box-shadow: 0 -1px 2px rgba(0,0,0,0.4);
+    height: 48px;
+    position: relative;
+}
+#logo{
+    margin-top: -5px;
+    position: absolute;
+}
+.profilePicture{
+    margin : 1px;
+    float: right;
+    max-width: 45px;
+    max-height: 45px;
+}
+#namespace{
+    color: white;
+    float:right;
+    margin-left: 10px;
+    margin-right: 15px;
+}
+#createSlides{
+    margin-top: 50px;
+    text-align: center;
+}
+#createSlidesBtn:hover{
+    opacity: 0.8;
+}
+
+#pptLists{
+    min-height: 500px;
+    margin-top:50px;
+    margin-left: 60px;
+    margin-right: 60px;
+    background-color : #969696;
+}
+
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    filter:alpha(opacity=70);
+    -moz-opacity:0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+    z-index: 100;
+    display: none;
+}
+.popup{
+    width: 100%;
+    margin: 0 auto;
+    display: none;
+    float: left;
+    position: absolute;
+    z-index: 101;
+}
+.background{
+    /* Set rules to fill background */
+    min-height: 100%;
+    min-width: 1024px;
+
+    /* Set up proportionate scaling */
+    width: 99%;
+    height: auto;
+
+    /* Set up positioning */
+    position: fixed;
+    background: url('assets/image/index/bg.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.content{
+    color:white;
+    text-align: center;
+    min-width: 600px;
+    width: 600px;
+    min-height: 300px;
+    margin: 100px auto;
+    background: #494949;
+    position: relative;
+    z-index: 103;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px #000;
+}
+.content .x{
+    float: right;
+    height: 35px;
+    left: 22px;
+    position: relative;
+    top: -75px;
+    width: 34px;
+}
+.content .x:hover{
+    cursor: pointer;
+}
+
+.snsLogin{
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.snsLogin:hover{
+    opacity: 0.8;
+}
+.newSlide:hover{
+    opacity: 0.8;
+}
+.userSlide:hover{
+    opacity: 0.8;
+}
+.slideName{
+    margin-left:30px;
+    max-width: 110px;
+}
+
