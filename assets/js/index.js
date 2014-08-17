@@ -6,6 +6,7 @@ $(document).ready(function(){
     win.load(function(){
         console.log('win.onload')
         console.log('tset')
+        console.log('test22')
         logo.css({
             left:win.innerWidth()/2-logo.width()/2
         })
