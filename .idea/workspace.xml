@@ -35,16 +35,16 @@
       <file leaf-file-name="sidebar.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/assets/js/sidebar.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="4" selection-start="35" selection-end="35" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+            <state line="19" column="14" selection-start="581" selection-end="581" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="slide.ejs" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="slide.ejs" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/slide.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="36" selection-start="1314" selection-end="1314" vertical-scroll-proportion="0.67017084" vertical-offset="0" max-vertical-offset="761">
+            <state line="33" column="40" selection-start="1277" selection-end="1277" vertical-scroll-proportion="-20.625" vertical-offset="0" max-vertical-offset="735">
               <folding>
                 <element signature="n#style#0;n#img#0;n#a#0;n#div#0;n#header#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#1;n#header#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -53,10 +53,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="slide.css" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="slide.css" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/assets/css/slide.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="85" column="23" selection-start="1567" selection-end="1567" vertical-scroll-proportion="0.0" vertical-offset="891" max-vertical-offset="2475">
+            <state line="89" column="0" selection-start="1622" selection-end="1622" vertical-scroll-proportion="0.45095542" vertical-offset="981" max-vertical-offset="2475">
               <folding />
             </state>
           </provider>
@@ -157,9 +157,9 @@
         <option value="$PROJECT_DIR$/assets/js/index.js" />
         <option value="$PROJECT_DIR$/assets/js/slide.js" />
         <option value="$PROJECT_DIR$/app.js" />
+        <option value="$PROJECT_DIR$/assets/js/sidebar.js" />
         <option value="$PROJECT_DIR$/views/slide.ejs" />
         <option value="$PROJECT_DIR$/assets/css/slide.css" />
-        <option value="$PROJECT_DIR$/assets/js/sidebar.js" />
       </list>
     </option>
   </component>
@@ -843,27 +843,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/assets/css/slide.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="85" column="23" selection-start="1567" selection-end="1567" vertical-scroll-proportion="0.0" vertical-offset="891" max-vertical-offset="2475">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/assets/js/sidebar.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="4" selection-start="35" selection-end="35" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+        <state line="19" column="14" selection-start="581" selection-end="581" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/slide.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="36" selection-start="1314" selection-end="1314" vertical-scroll-proportion="0.67017084" vertical-offset="0" max-vertical-offset="761">
+        <state line="33" column="40" selection-start="1277" selection-end="1277" vertical-scroll-proportion="-20.625" vertical-offset="0" max-vertical-offset="735">
           <folding>
             <element signature="n#style#0;n#img#0;n#a#0;n#div#0;n#header#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#header#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/css/slide.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="89" column="0" selection-start="1622" selection-end="1622" vertical-scroll-proportion="0.45095542" vertical-offset="981" max-vertical-offset="2475">
+          <folding />
         </state>
       </provider>
     </entry>
