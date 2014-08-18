@@ -24,17 +24,14 @@ header{
     background: #6f6f6f;
     width: 100%;
     height: 100%;
-    /*min-width: 1024px;*/
-    /*min-height: 800px;*/
-    /* Set up positioning */
-    background: url('../image/index/bg.jpg') no-repeat center center fixed;
+
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
 }
 .toolmenu{
-    background-color: #030303;
+    background-color: #FDFCDD;
     width:100%;
     height:120px;
 
@@ -76,8 +73,8 @@ header{
     float: left;
 }
 .canvas-container{
-    width:100%;
-    height:510px;
+    width:1330px;
+    height:530px;
     background: #D6D6D6;
     padding:40px;
 }
@@ -85,19 +82,14 @@ header{
 .canvas{
     width:900px;
     height:500px;
-<<<<<<< HEAD
     background: #A6957C;
     margin-left: 170px;
-=======
-    background: #000000;
-    margin-left: 171px;
->>>>>>> 6578ca0dfd568961a3adb8c8543a0cd3333f55d1
 }
 .sidebar {
     position: absolute;
     top:0;
     background: #494949;
-    width: 300px;
+    width: 310px;
     margin-left: -270px;
     margin-top:0.5%;
     margin-right: 5%;
@@ -111,28 +103,31 @@ header{
     height: 100%;
     background: #494949;
 }
-.user1{
-    width: 100%;
-    height: 6%;
+#userList{
+    float:right;
+}
+#user1{
+    width: 48px;
+    height: 48px;
     background: #959597;
-    padding-top: 4%;
-    margin-top: 287px;
+    margin-left:10px;
+    margin-bottom: 10px;
+    /*padding-top: 4%;*/
 
 }
-.user2{
-    width: 100%;
-    height: 6%;
+#user2{
+    width: 48px;
+    height: 48px;
     background: #959597;
-    margin-top: 2px;
-    text-align: center;
-
+    margin-left:10px;
+    margin-bottom: 10px;
 }
-.user3{
-    width: 100%;
-    height: 6%;
+#user3{
+    width: 48px;
+    height: 48px;
     background: #959597;
-    text-align: center;
-    margin-top: 2px;
+    margin-left:10px;
+    margin-bottom: 10px;
 }
 .sidebar-list {
     width: 100%;
@@ -163,7 +158,34 @@ header{
 }
 
 #slideTable{
-    background: #000;
+    background: #202020;
     margin:20px;
-    height:240px;
+    margin-right:50px;
+    margin-left:30px;
+    height:260px;
+    overflow: auto;
+}
+#slideTable img{
+    margin:10px;
+    width :80px;
+    height :70px;
+}
+#chatRoom{
+    background: #202020;
+    margin-right:50px;
+    margin-left:30px;
+    height:280px;
+}
+#chatMessage{
+    background: #202020;
+    margin-top:10px;
+    margin-right:50px;
+    margin-left:30px;
+    height:50px;
+}
+#toolList{
+    background: #202020;
+    margin-right:50px;
+    margin-left:30px;
+    height:60px;
 }
