@@ -1,0 +1,162 @@
+header{
+    background: #494949;
+    box-shadow: 0 -1px 2px rgba(0,0,0,0.4);
+    height: 48px;
+    position: relative;
+}
+#logo{
+    margin-top: -5px;
+    position: absolute;
+}
+.profilePicture{
+    margin : 1px;
+    float: right;
+    max-width: 45px;
+    max-height: 45px;
+}
+#namespace{
+    color: white;
+    float:right;
+    margin-left: 10px;
+    margin-right: 15px;
+}
+.background{
+    background: #6f6f6f;
+    width: 100%;
+    height: 100%;
+    /*min-width: 1024px;*/
+    /*min-height: 800px;*/
+    /* Set up positioning */
+    background: url('../image/index/bg.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+.toolmenu{
+    background-color: #030303;
+    width:100%;
+    height:120px;
+
+}
+.PPTtool1{
+    background-color: #6f6f6f;
+    width:20%;
+    height:80%;
+    margin-top:1%;
+    margin-left: 5%;
+    margin-right: 2%;
+    float: left;
+}
+.PPTtool2{
+    background-color: #6f6f6f;
+    width:20%;
+    height:80%;
+    margin-top:1%;
+    margin-left: 2%;
+    margin-right: 2%;
+    float: left;
+}
+.PPTtool3{
+    background-color: #6f6f6f;
+    width:20%;
+    height:80%;
+    margin-top:1%;
+    margin-left: 2%;
+    margin-right: 2%;
+    float: left;
+}
+.PPTtool4{
+    background-color: #6f6f6f;
+    width:20%;
+    height:80%;
+    margin-top:1%;
+    margin-left: 2%;
+    /*margin-right: 2%;*/
+    float: left;
+}
+
+.canvas{
+    background: #cecece;
+    width:90%;
+    height:570px;
+    margin-top:1%;
+    margin-bottom:1%;
+    margin-left: 5%;
+    margin-right: 5%;
+
+
+}
+
+.sidebar {
+    position: absolute;
+    top:0;
+    background: silver;
+    width: 300px;
+    margin-left: -270px;
+    margin-top:0.7%;
+    margin-bottom:1%;
+    margin-right: 5%;
+    height: 759px;
+}
+.sidebar-toggle {
+    position: absolute;
+    top: 2px;
+    right: 0px;
+    width: 45px;
+    height: 100%;
+    background: #494949;
+}
+.user1{
+    width: 100%;
+    height: 6%;
+    background: #959597;
+    padding-top: 4%;
+    margin-top: 287px;
+
+}
+.user2{
+    width: 100%;
+    height: 6%;
+    background: #959597;
+    margin-top: 2px;
+    text-align: center;
+
+}
+.user3{
+    width: 100%;
+    height: 6%;
+    background: #959597;
+    text-align: center;
+    margin-top: 2px;
+}
+.sidebar-list {
+    width: 85%;
+    height :100%
+}
+
+.slidelist {
+    background: #494949;
+    width: 100%;
+    height: 38%;
+    z-index: 100;
+    /*margin-top:0.5%;*/
+    /*margin-bottom:0.5%;*/
+}
+.chat{
+    background: #494949;
+    width: 100%;
+    height: 48%;
+    z-index: 100;
+    margin-top:0.5%;
+
+}
+.other_tool{
+    background: #494949;
+    width: 100%;
+    height: 13%;
+    z-index: 100;
+    margin-top:0.5%;
+    /*margin-bottom:0.5%;*/
+}
+

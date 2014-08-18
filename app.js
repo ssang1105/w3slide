@@ -34,6 +34,7 @@ app.set('view engine', 'ejs');
 server = http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
 });
+
 var io = socketio.listen(server);
 io.set('log level', 1);
 
@@ -63,7 +64,6 @@ var PPTSchema = new mongoose.Schema({
 })
 
 var PPTs = mongoose.model('ppts', PPTSchema);
-
 var Users = mongoose.model('users',UserSchema);
 
 if (process.env.NODE_ENV === 'development') {
@@ -150,7 +150,6 @@ app.get('/auth/google/callback',
             successRedirect: '/login_success',
             failureRedirect: '/login_fail'
         }
-
     ));
 
 app.get('/auth/facebook', passport.authenticate('facebook'));
@@ -218,22 +217,25 @@ io.sockets.on('connection', function (socket) {
         newSlides.members.push({ name : user.username, profilePicture:user.profilePicture, email:user.email, id:user.id})
         newSlides.save(function(err,newSlides){
                 if(err) throw err;
-            })
+            });
         Users.findOne({'id':user.id},function(err,user){
             PPTs.findOne({'id':user.id+user.projectNum+pptName},function(err,ppt){
-                if(err){
-                    throw err;
-                }
+                if(err) throw err;
                 console.log(ppt)
                 user.projectList.push(ppt.id);
                 user.save(function(err,newUser){
                     if(err) throw err;
                 });
             });
+            app.get('/'+pptURL, ensureAuthenticated, function(req, res){
+
+                // 사용자 저장 (PPT  members내에 있는 지 중복check)
+                // 사용자 뿌려주기 (DB의 해당 Schema의 members들을 전부 뿌려준다)
+                // 사용자 로그인/로그오프는 d
+                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id });
+            });
         });
-        app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-            res.render('slide');
-        });
+
     })
 
     socket.on('getUsersPPT',function(userID){
@@ -245,10 +247,14 @@ io.sockets.on('connection', function (socket) {
             }
         });
     });
-    socket.on('makeSlide',function(pptURL){
-        app.get('/'+pptURL, function(req, res){
-            res.render('slide');
-        });
+    socket.on('loadExistSlide',function(pptURL, userID){
+        Users.findOne({'id':userID},function(err,user){
+            if(err) throw err;
+            app.get('/'+pptURL, ensureAuthenticated, function(req, res){
+//                socket
+                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id });
+            });
+        })
     });
 
     socket.on('disconnect', function(){

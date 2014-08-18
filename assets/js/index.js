@@ -8,5 +8,8 @@ $(document).ready(function(){
         logo.css({
             left:win.innerWidth()/2-logo.width()/2
         })
+        $('.background').css({
+        })
     });
+
 });

@@ -15,13 +15,18 @@ $(document).ready(function(){
         socket.emit('getUsersPPT', userID);
         socket.on('userPPT', function(ppt){
             // 불러올 PPT가 있을 경우에
-            console.log(ppt.url)
             if(ppt)
-                var existingSlides = '<div class="userSlide" id='+ppt.url+' style="float:left;"><a href="#"><img src="'+ ppt.thumbnail+'" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false">' +
+                var existingSlides = '<div class="userSlide" id='+ppt.url+' onclick="location.href=\'' + '/' + ppt.url + '\'" style="float:left;"><a href="#"><img src="'+ ppt.thumbnail+'" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false">' +
                     '<div><div style="margin-left:30px;"></div><div style="margin-left: 30px">'+ ppt.fileName+'</div></a>';
             pptLists.append(existingSlides);
             $('#'+ppt.url).click(function(e){
-                socket.emit('makeSlide',ppt.url);
+                console.log(ppt.url)
+                socket.emit('loadExistSlide',ppt.url, userID);
+                // 슬라이드를 클릭하여 slide.ejs로 가면, ppt schema에 저장 되어 있던 PPT 정보, 멤버 띄우기
+                        // 새 프로젝트일 때 (일단 파싱 방법이 확정되야됨.)
+                        // 기존 프로젝트일 때 (일단 파싱 방법이 확정되야됨)
+                // slide.ejs의 발표 도구는 Fix
+                // slide.ejs에서 사용자의 모든 행동이 실시간으로 저장이 되도록 하기
             })
 
         });
@@ -63,7 +68,8 @@ $(document).ready(function(){
 
     socket.on('slideInfo',function(user){
         // 나중에는 PPT 미리보기가 가능하게 하기위해서 이미지 SRC를 PPT Schema에서 PPT 썸네일 가져와야겠다.
-        var newSlide = '<div class="userSlide" id='+makeid()+' style="float:left;"><a href="#"><img src="../assets/image/index/samplePPT.png" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false"><div>' +
+        var pptURL = makeid();
+        var newSlide = '<div class="userSlide" id='+pptURL+' onclick="location.href=\'' + '/' + pptURL + '\'"  style="float:left;"><a href="#"><img src="../assets/image/index/samplePPT.png" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false"><div>' +
             '<input class="slideName" type="text" value="Enter the name"><div style="margin-left:30px;" id="slideName'+user.projectNum+'"></div></div></a>';
         pptLists.append(newSlide);
         $('.slideName').focus().keypress(function(e) {

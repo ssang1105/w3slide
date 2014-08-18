@@ -75,7 +75,7 @@ header{
 
     /* Set up positioning */
     position: fixed;
-    background: url('assets/image/index/bg.jpg') no-repeat center center fixed;
+    background: url('../image/index/bg.jpg') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
