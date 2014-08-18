@@ -78,14 +78,13 @@ header{
 
 .canvas{
     background: #cecece;
-    width:90%;
+    width:1015px;
     height:570px;
+
     margin-top:1%;
     margin-bottom:1%;
-    margin-left: 5%;
-    margin-right: 5%;
-
-
+    margin-left: 220px;
+    margin-right: 100px;
 }
 
 .sidebar {
@@ -94,7 +93,7 @@ header{
     background: silver;
     width: 300px;
     margin-left: -270px;
-    margin-top:0.7%;
+    margin-top:0.5%;
     margin-bottom:1%;
     margin-right: 5%;
     height: 759px;
@@ -131,17 +130,16 @@ header{
     margin-top: 2px;
 }
 .sidebar-list {
-    width: 85%;
+    width: 100%;
     height :100%
 }
 
 .slidelist {
     background: #494949;
+    margin-top:1px;
     width: 100%;
     height: 38%;
     z-index: 100;
-    /*margin-top:0.5%;*/
-    /*margin-bottom:0.5%;*/
 }
 .chat{
     background: #494949;
@@ -157,6 +155,5 @@ header{
     height: 13%;
     z-index: 100;
     margin-top:0.5%;
-    /*margin-bottom:0.5%;*/
 }
 

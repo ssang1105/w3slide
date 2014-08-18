@@ -261,3 +261,7 @@ io.sockets.on('connection', function (socket) {
         console.log("Socket Disconnected");
     })
 });
+
+/*
+    서버가 켜지면 PPT Schema 모두를 열어
+ */

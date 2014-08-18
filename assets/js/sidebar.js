@@ -1,7 +1,7 @@
 $(document).ready(function() {
     sidebarStatus = false;
     console.log('q')
-    $('.sidebar-toggle').click(function() {
+    $('.sidebar').click(function() {
         if (sidebarStatus == false) {
             $('.sidebar').animate({
                 marginLeft: "0px",
@@ -9,6 +9,10 @@ $(document).ready(function() {
             }, 500);
             $('.background').animate({
                 marginLeft: "270px",
+                opacity: "1"
+            }, 500);
+            $('.canvas').animate({
+                marginLeft: "350px",
                 opacity: "1"
             }, 500);
             sidebarStatus = true;
@@ -20,6 +24,10 @@ $(document).ready(function() {
             }, 500);
             $('.background').animate({
                 marginLeft: "0px",
+                opacity: "1"
+            }, 500);
+            $('.canvas').animate({
+                marginLeft: "220px",
                 opacity: "1"
             }, 500);
             sidebarStatus = false;
