@@ -85,8 +85,13 @@ header{
 .canvas{
     width:900px;
     height:500px;
+<<<<<<< HEAD
     background: #A6957C;
     margin-left: 170px;
+=======
+    background: #000000;
+    margin-left: 171px;
+>>>>>>> 6578ca0dfd568961a3adb8c8543a0cd3333f55d1
 }
 .sidebar {
     position: absolute;
