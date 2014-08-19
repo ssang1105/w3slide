@@ -1,6 +1,5 @@
 $(document).ready(function() {
     sidebarStatus = false;
-    console.log('q')
     $('.background').click(function() {
         if (sidebarStatus == false) {
             $('.sidebar').animate({

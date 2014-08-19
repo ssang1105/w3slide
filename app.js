@@ -228,15 +228,10 @@ io.sockets.on('connection', function (socket) {
                 });
             });
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-
-                // 사용자 저장 (PPT  members내에 있는 지 중복check)
-                // 사용자 뿌려주기 (DB의 해당 Schema의 members들을 전부 뿌려준다)
-                // 사용자 로그인/로그오프는 d
-                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id });
+                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id, pptURL:pptURL });
             });
         });
-
-    })
+    });
 
     socket.on('getUsersPPT',function(userID){
         Users.findOne({'id':userID},function(err,user){
@@ -251,11 +246,30 @@ io.sockets.on('connection', function (socket) {
         Users.findOne({'id':userID},function(err,user){
             if(err) throw err;
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-//                socket
-                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id });
+
+                var someSlide = io.of('/'+pptURL).on('connection', function(room){
+                    console.log(user.username + ' connect to Room ' + pptURL);
+
+                    room.on('getSlideMembers', function(pptURL){
+                        PPTs.findOne({'url':pptURL}, function(err,ppt){
+                            if(err) throw err;
+                            room.emit('SlideMembers',ppt.members)
+                        })
+                    });
+
+                    room.on('disconnect', function(){
+                        // 어둡게하는 .css({ opacitiy : 0.3 })
+                        console.log("Room Socket Disconnected");
+                    });
+
+                });
+                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id, pptURL:pptURL });
             });
+
         })
     });
+
+
 
     socket.on('disconnect', function(){
         console.log("Socket Disconnected");
@@ -263,5 +277,5 @@ io.sockets.on('connection', function (socket) {
 });
 
 /*
-    서버가 켜지면 PPT Schema 모두를 열어
+    서버가 켜지면 PPT Schema에 있는 pptURL들을 모두를 열어
  */

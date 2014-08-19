@@ -3,6 +3,7 @@
 <head>
     <title>WWW Slides</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="http://localhost:3000/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
     <script type="text/javascript" src="../assets/js/sidebar.js"></script>
     <script type="text/javascript" src="../assets/js/slide.js"></script>
     <link rel="stylesheet" href="../assets/css/slide.css">
@@ -10,7 +11,6 @@
 <body>
 
 <div class="sidebar">
-
     <div class="sidebar-list">
         <div class="slidelist">
             <div id="slideTable">
@@ -27,13 +27,7 @@
 
         <div class="chat">
             <div id="userList">
-                <div id = "user1"></div>
-                <div id = "user1"></div>
-                <div id = "user1"></div>
-                <div id = "user1"></div>
-                <!--members의 갯수를 찾아와 동적으로 뿌려주자
-                    id값이 userID
-                -->
+                <!--추가 됨-->
             </div>
             <div id="chatRoom"></div>
             <div id="chatMessage"></div>
@@ -49,7 +43,7 @@
 </div>
 <div class = "background">
     <header>
-        <div id="logo"><a href><img src="../assets/image/index/logo.png" style="width:60%"></a></div>
+        <div id="logo"  class="<%=pptURL%>"><a href><img src="../assets/image/index/logo.png" style="width:60%"></a></div>
         <div style="float: right;  background: #969696; min-width: 190px; max-height: 48px">
             <p id="namespace"><%=namespace%></p>
             <img src='<%=profileImage%>' id="<%=userID%>" class="profilePicture"></div>

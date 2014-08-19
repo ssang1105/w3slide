@@ -20,13 +20,10 @@ $(document).ready(function(){
                     '<div><div style="margin-left:30px;"></div><div style="margin-left: 30px">'+ ppt.fileName+'</div></a>';
             pptLists.append(existingSlides);
             $('#'+ppt.url).click(function(e){
-                console.log(ppt.url)
                 socket.emit('loadExistSlide',ppt.url, userID);
                 // 슬라이드를 클릭하여 slide.ejs로 가면, ppt schema에 저장 되어 있던 PPT 정보, 멤버 띄우기
                         // 새 프로젝트일 때 (일단 파싱 방법이 확정되야됨.)
                         // 기존 프로젝트일 때 (일단 파싱 방법이 확정되야됨)
-                // slide.ejs의 발표 도구는 Fix
-                // slide.ejs에서 사용자의 모든 행동이 실시간으로 저장이 되도록 하기
             })
 
         });
