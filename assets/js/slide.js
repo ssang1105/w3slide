@@ -27,7 +27,7 @@ $(document).ready(function(){
         // 멤버의 수만큼 동적으로 뿌려주기
         console.log(members)
         for(var i=0; i<members.length; i++){
-              userList.append('<img src="'+ members[i].profilePicture+'" class = "users" id="'+members[i].id+'">')
+            userList.append('<div><img src="'+ members[i].profilePicture+'" class = "users" id="'+members[i].id+'"></div>')
         }
     })
 

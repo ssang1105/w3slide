@@ -228,6 +228,22 @@ io.sockets.on('connection', function (socket) {
                 });
             });
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
+                var someSlide = io.of('/'+pptURL).on('connection', function(room){
+                    console.log(user.username + ' connect to Room ' + pptURL);
+
+                    room.on('getSlideMembers', function(pptURL){
+                        PPTs.findOne({'url':pptURL}, function(err,ppt){
+                            if(err) throw err;
+                            room.emit('SlideMembers',ppt.members)
+                        })
+                    });
+
+                    room.on('disconnect', function(){
+                        // 어둡게하는 .css({ opacitiy : 0.3 })
+                        console.log("Room Socket Disconnected");
+                    });
+
+                });
                 res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id, pptURL:pptURL });
             });
         });

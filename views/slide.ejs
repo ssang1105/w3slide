@@ -13,6 +13,7 @@
 <div class="sidebar">
     <div class="sidebar-list">
         <div class="slidelist">
+            <img src="../assets/image/slide/sidebar/toggleBtn_1.png" id="sidebarBtn">
             <div id="slideTable">
                 <img src="../assets/image/index/samplePPT.png">
                 <img src="../assets/image/index/samplePPT.png">
@@ -23,6 +24,7 @@
                 <img src="../assets/image/index/samplePPT.png">
                 <!--슬라이드의 갯수를 받아와 슬라이드 이미지를 동적으로 뿌려주자-->
             </div>
+
         </div>
 
         <div class="chat">
@@ -49,48 +51,43 @@
             <img src='<%=profileImage%>' id="<%=userID%>" class="profilePicture"></div>
     </header>
     <div class="toolmenu">
-            <div class="PPTtool1">
-                <img class="tools" src="../assets/image/slide/toolbar/del_slide.png">
-                <img class="tools" src="../assets/image/slide/toolbar/add_slide.png">
+            <div class="PPTtool1" draggable="false">
+                <img class="tools_1" src="../assets/image/slide/toolbar/del_slide.png" draggable="false">
+                <img class="tools_1" src="../assets/image/slide/toolbar/add_slide.png" draggable="false">
             </div>
-            <div class="division_line"></div>
-            <div class="PPTtool2">
+            <div class="division_line" draggable="false"></div>
+            <div class="PPTtool2" draggable="false">
                 <div id="font"></div> <div id="font-size"></div>
                 <div id="font-feature">
-                    <div id="font-bold"></div>
-                    <div id="font-incline"></div>
-                    <div id="font-underline"></div>
-                    <div id="font-color"></div>
+                    <img src="../assets/image/slide/toolbar/font_bold.png" id="font-bold" draggable="false">
+                    <img src="../assets/image/slide/toolbar/font_incline.png" id="font-incline" draggable="false">
+                    <img src="../assets/image/slide/toolbar/font_underline.png" id="font-underline" draggable="false" >
+                    <img src="../assets/image/slide/toolbar/font_default.png" id="font-color" draggable="false">
                 </div>
                 <div id="text-align">
-                    <div id="alignLeft"></div>
-                    <div id="alignCenter"></div>
-                    <div id="alignRight"></div>
+                    <img src="../assets/image/slide/toolbar/align_right.png" id="alignRight" draggable="false">
+                    <img src="../assets/image/slide/toolbar/align_center.png" id="alignCenter" draggable="false">
+                    <img src="../assets/image/slide/toolbar/align_left.png" id="alignLeft" draggable="false">
                 </div>
             </div>
             <div class="division_line"></div>
-            <div class="PPTtool3">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+            <div class="PPTtool3" draggable="false">
+                <img src="../assets/image/slide/toolbar/textbox.png" id="textbox">
+                <img src="../assets/image/slide/toolbar/rect.png" id="rect" >
+                <img src="../assets/image/slide/toolbar/circle.png" id="circle" >
+                <img src="../assets/image/slide/toolbar/triangle.png" id="triangle">
+                <img src="../assets/image/slide/toolbar/arrow_figure_1.png" id="simple_arrow1">
+                <img src="../assets/image/slide/toolbar/arrow_figure_2.png" id="simple_arrow2">
+                <img src="../assets/image/slide/toolbar/arrow_inter_1.png" id="inter_arrow1">
+                <img src="../assets/image/slide/toolbar/arrow_inter_2.png" id="inter_arrow2">
+                <img src="../assets/image/slide/toolbar/line.png" id="line" style=" margin-top:27px; width:40px; height: 5px;">
+                <img src="../assets/image/slide/toolbar/arrow_line.png" id="line_arrow">
             </div>
             <div class="division_line"></div>
             <div class="PPTtool4">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-
+                <img src="../assets/image/slide/toolbar/table.png" id="table">
+                <img src="../assets/image/slide/toolbar/uploadImage.png" id="uploadImage">
+                <img src="../assets/image/slide/toolbar/animation.png" id="animation">
             </div>
     </div>
 </div>
