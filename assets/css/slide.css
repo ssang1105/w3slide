@@ -40,7 +40,7 @@ header{
 .canvas{
     width:950px;
     height:530px;
-    background: #A6957C;
+    background: white;
     margin-left: 210px;
 }
 
@@ -55,12 +55,18 @@ header{
 
 }
 .PPTtool1{
-    background-color: #6f6f6f;
     width:200px;
     height:80%;
     margin-top:1%;
     margin-left: 4%;
     float: left;
+}
+.PPTtool1 img{
+    width: 100px;
+    float:left;   
+}
+.PPTtool1 img:hover{
+    opacity: 0.3;
 }
 .PPTtool2{
     width:20%;
@@ -73,6 +79,8 @@ header{
     background-color: #FFFFFF;
     width:20%;
     height:80%;
+    max-width:230px;
+    max-height: 80px;
     margin-top:1%;
     margin-left: 1%;
     float: left;
@@ -90,35 +98,30 @@ header{
 
 .PPTtool3 img{
     float:left;
-    width:17%;
     margin-left: 15px;
     margin-right: 3px;
     margin-top:8px;
     margin-bottom:7px;
-    height:50%;
+    width:32px;
+    height: 32px;
 }
 .PPTtool3 img:hover{
     opacity: 0.3;
 }
 .PPTtool4 img{
     float:left;
-    width:20%;
+    width:64px;
+    height:64px;
     margin-left: 10px;
     margin-right:20px;
+    margin-top : 12px;
     margin-bottom:5px;
-    height:100%;
 }
 .PPTtool4 img:hover{
     opacity: 0.3;
 }
 
-.tools_1{
-    width: 100px;
-    float:left;
-}
-.tools_1:hover{
-    opacity: 0.8;
-}
+
 .division_line{
     margin-left:20px;
     margin-right:10px;
@@ -133,6 +136,7 @@ header{
     width:60%;
     height:40%;
     border : solid #000000;
+    border-width: 1px;
 }
 #font:hover{
     opacity: 0.4;
@@ -143,6 +147,7 @@ header{
     width:30%;
     height:40%;
     border : solid #000000;
+    border-width: 1px;
 }
 #font-size:hover{
     opacity: 0.4;

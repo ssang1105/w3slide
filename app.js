@@ -276,6 +276,11 @@ io.sockets.on('connection', function (socket) {
                     room.on('disconnect', function(){
                         // 어둡게하는 .css({ opacitiy : 0.3 })
                         console.log("Room Socket Disconnected");
+                        fs.writeFileSync('./abcd.txt', socket, 'utf-8',function(err ){
+                            if(err) throw err;
+
+
+                        });
                     });
 
                 });
@@ -284,8 +289,6 @@ io.sockets.on('connection', function (socket) {
 
         })
     });
-
-
 
     socket.on('disconnect', function(){
         console.log("Socket Disconnected");
