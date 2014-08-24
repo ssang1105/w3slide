@@ -57,10 +57,13 @@ var PPTSchema = new mongoose.Schema({
         id : String
     }],
     createdDate : Date,
-    pptContents : String,
+    pptContents : [{
+        slide : String
+    }],
     thumbnail : String,
     id : String,
-    url : String
+    url : String,
+    isNewSlide : Boolean
 })
 
 var PPTs = mongoose.model('ppts', PPTSchema);
@@ -110,13 +113,15 @@ passport.use(new FacebookStrategy({
         clientID :'698552830212995',
         clientSecret : 'c28eb14acf960f3e912086a6dddd9f7d',
         callbackURL : 'http://localhost:3000/auth/facebook/callback',
-        profileFields: ['id', 'displayName', 'link', 'photos', 'emails']
+        profileFields: ['id', 'displayName', 'link', 'photos', 'emails'],
     },
     function(accessToken, refreshToken, profile, done) {
+        console.log(accessToken)
         Users.findOne({id:profile.id}, function(err, oldUser){
             if(oldUser){
                 done(null,oldUser);
             }else{
+                console.log(profile)
                 var newUser = new Users({
                     provider : 'Facebook',
                     id : profile.id,
@@ -152,7 +157,7 @@ app.get('/auth/google/callback',
         }
     ));
 
-app.get('/auth/facebook', passport.authenticate('facebook'));
+app.get('/auth/facebook', passport.authenticate('facebook', {scope:['email'] }));
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', {
         successRedirect: '/login_success',
@@ -160,9 +165,11 @@ app.get('/auth/facebook/callback',
         scope: ['email']
     })
 );
+
 app.get('/login_success', ensureAuthenticated, function(req, res, next){
-    res.render('success_login', { profileImage : req.user.profilePicture, namespace:req.user.username, userID:req.user.id })
+    res.render('success_login', { profileImage : req.user.profilePicture, namespace:req.user.username, userID:req.user.id } )
 });
+
 app.get('/logout', ensureAuthenticated, function(req, res){
     req.logout();
     res.redirect('/');
@@ -184,17 +191,16 @@ mongoose.connect('mongodb://localhost/mydb',function(err){
 io.sockets.on('connection', function (socket) {
     console.log('Socket Connected');
 
-    socket.on('createSlide', function(userID){
+    socket.on('createSlide', function(userID, isNewSlide){
         Users.findOne({'id':userID},function(err,user){
             if(err){
                 console.err(err);
                 throw err;
             }
-
             user.projectNum++;
-            user.save();
+            user.update();
             console.log('Create Slide')
-            socket.emit('slideInfo', user);
+            socket.emit('slideInfo', user, isNewSlide);
         })
 
     });
@@ -209,23 +215,18 @@ io.sockets.on('connection', function (socket) {
                 id : user.id
             },
             createdDate : Date.now(),
-            pptContents : null,
             thumbnail : pptImg,
             id : user.id+user.projectNum+pptName,
-            url : pptURL
+            url : pptURL,
+            isNewSlide : true
         });
+        console.log(newSlides.id);
         newSlides.members.push({ name : user.username, profilePicture:user.profilePicture, email:user.email, id:user.id})
-        newSlides.save(function(err,newSlides){
-                if(err) throw err;
-            });
+        newSlides.save(function(err){ if(err) throw err; });
         Users.findOne({'id':user.id},function(err,user){
-            PPTs.findOne({'id':user.id+user.projectNum+pptName},function(err,ppt){
+            user.projectList.push(newSlides);
+            user.save(function(err,newUser){
                 if(err) throw err;
-                console.log(ppt)
-                user.projectList.push(ppt.id);
-                user.save(function(err,newUser){
-                    if(err) throw err;
-                });
             });
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
                 var someSlide = io.of('/'+pptURL).on('connection', function(room){
@@ -234,9 +235,65 @@ io.sockets.on('connection', function (socket) {
                     room.on('getSlideMembers', function(pptURL){
                         PPTs.findOne({'url':pptURL}, function(err,ppt){
                             if(err) throw err;
-                            room.emit('SlideMembers',ppt.members)
+                            room.emit('slideMembers',ppt.members, ppt.isNewSlide)
                         })
                     });
+
+                    room.on('saveSlide', function(pptURL, jsonSlide, pageNum){
+                        PPTs.findOne({'url':pptURL}, function(err,ppt){
+                            if (err) throw err;
+                            ppt.isNewSlide = false;
+
+                            // mongoose array의 특정 index에 jsonSlide를 못넣어.. sub document
+
+                            ppt.pptContents.$pop();
+                            ppt.pptContents.push({
+                                slide: jsonSlide
+                            });
+                            ppt.save();
+//
+//                            ppt.pptContents.update(
+//                                {},
+//                                { "$push": {
+//                                    "list": {
+//                                        "$each": [ 1, 2, 3 ],
+//                                        "$position": 0 }
+//                                }
+//                                },function(err,NumAffected) {
+//                                    console.log("done");
+//
+//                                });
+
+                            console.log('***********')
+                            console.log(ppt.pptContents)
+                            console.log('***********')
+
+//                            ppt.pptContents.set(pageNum, subdoc);
+
+
+
+//                            ppt.pptContents.$pop();
+//                            ppt.pptContents.push({ 'slide' :jsonSlide })
+
+//                            ppt.save();
+//                                push({
+//                                slide : jsonSlide
+//                            });
+//                            ppt.update();
+//                            console.log(ppt.pptContents[0])
+                        })
+                    })
+                    room.on('getExistSlideSVG', function(pptURL){
+                        console.log(pptURL)
+                        PPTs.findOne({'url':pptURL}, function(err,ppt){
+                            if(err) throw err;
+                            console.log(ppt.pptContents[0].slide)
+                            console.log('****************************')
+                            room.emit('slideSVG',ppt.pptContents[0].slide)
+                        })
+                    })
+
+
 
                     room.on('disconnect', function(){
                         // 어둡게하는 .css({ opacitiy : 0.3 })
@@ -250,43 +307,64 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('getUsersPPT',function(userID){
+        // PPT members의 id 중 userID와 일치하는 members를 찾아서 뿌려주기.
         Users.findOne({'id':userID},function(err,user){
-            for(var i=0; i<user.projectList.length; i++){
-                PPTs.findOne({'id':user.projectList[i]},function(err,ppt){
+            PPTs.find({members :  {$elemMatch : {'id' : userID}}}, function(err,ppts){
+                ppts.forEach(function (ppt) {
                     socket.emit('userPPT', ppt)
-                });
-            }
+                })
+            })
         });
     });
     socket.on('loadExistSlide',function(pptURL, userID){
+
+
         Users.findOne({'id':userID},function(err,user){
             if(err) throw err;
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-
                 var someSlide = io.of('/'+pptURL).on('connection', function(room){
                     console.log(user.username + ' connect to Room ' + pptURL);
 
                     room.on('getSlideMembers', function(pptURL){
+
                         PPTs.findOne({'url':pptURL}, function(err,ppt){
                             if(err) throw err;
-                            room.emit('SlideMembers',ppt.members)
+                            room.emit('slideMembers',ppt.members, ppt.isNewSlide)
                         })
                     });
+
+                    room.on('saveSlide', function(pptURL, jsonSlide){
+                        PPTs.findOne({'url':pptURL}, function(err,ppt){
+                            if (err) throw err;
+                            ppt.isNewSlide = false;
+                            ppt.update({
+                                pptContents : {$push: {'slide' : jsonSlide}}
+                            })
+
+                            ppt.update();
+                            console.log(ppt.pptContents)
+                        })
+                    })
+
+                    room.on('getExistSlideSVG', function(pptURL){
+                        console.log(pptURL)
+                        PPTs.findOne({'url':pptURL}, function(err,ppt){
+                            if(err) throw err;
+                            console.log(ppt.pptContents)
+                            console.log('****************************')
+                            room.emit('slideSVG',ppt.pptContents)
+                        })
+                    })
+
 
                     room.on('disconnect', function(){
                         // 어둡게하는 .css({ opacitiy : 0.3 })
                         console.log("Room Socket Disconnected");
-                        fs.writeFileSync('./abcd.txt', socket, 'utf-8',function(err ){
-                            if(err) throw err;
-
-
-                        });
                     });
 
                 });
                 res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id, pptURL:pptURL });
             });
-
         })
     });
 

@@ -9,23 +9,26 @@ $(document).ready(function(){
         btn_uploadPPT = $('#uploadPPT'),
         pptLists = $('#pptLists'),
         socket = io.connect('http://localhost:3000/'),
-        userID = $('.profilePicture')[0].id;
+        userID = $('.profilePicture')[0].id,
+        isNewSlide
+
 
     win.load(function(){
         socket.emit('getUsersPPT', userID);
         socket.on('userPPT', function(ppt){
+            console.log(ppt)
             // 불러올 PPT가 있을 경우에
-            if(ppt)
+            if(ppt){
                 var existingSlides = '<div class="userSlide" id='+ppt.url+' onclick="location.href=\'' + '/' + ppt.url + '\'" style="float:left;"><a href="#"><img src="'+ ppt.thumbnail+'" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false">' +
                     '<div><div style="margin-left:30px;"></div><div style="margin-left: 30px">'+ ppt.fileName+'</div></a>';
-            pptLists.append(existingSlides);
-            $('#'+ppt.url).click(function(e){
+                pptLists.append(existingSlides);
+                $('#'+ppt.url).click(function(e){
                 socket.emit('loadExistSlide',ppt.url, userID);
                 // 슬라이드를 클릭하여 slide.ejs로 가면, ppt schema에 저장 되어 있던 PPT 정보, 멤버 띄우기
                         // 새 프로젝트일 때 (일단 파싱 방법이 확정되야됨.)
                         // 기존 프로젝트일 때 (일단 파싱 방법이 확정되야됨)
-            })
-
+                })
+            }
         });
     });
 
@@ -46,6 +49,7 @@ $(document).ready(function(){
 
 
     btn_uploadPPT.click(function(){
+        isNewSlide=false;
         console.log('file upload');
         // 파일 업로드
         // pptx 파일만 선택 가능하도록
@@ -56,19 +60,22 @@ $(document).ready(function(){
     });
 
     btn_createPPT.click(function(){
-        socket.emit('createSlide', userID);
+        isNewSlide=true
+        socket.emit('createSlide', userID, isNewSlide);
         popup.hide();
         overlay.appendTo(document.body).remove();
     });
 
 
 
-    socket.on('slideInfo',function(user){
+    socket.on('slideInfo',function(user, isNewSlide){
         // 나중에는 PPT 미리보기가 가능하게 하기위해서 이미지 SRC를 PPT Schema에서 PPT 썸네일 가져와야겠다.
         var pptURL = makeid();
         var newSlide = '<div class="userSlide" id='+pptURL+' onclick="location.href=\'' + '/' + pptURL + '\'"  style="float:left;"><a href="#"><img src="../assets/image/index/samplePPT.png" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false"><div>' +
             '<input class="slideName" type="text" value="Enter the name"><div style="margin-left:30px;" id="slideName'+user.projectNum+'"></div></div></a>';
+
         pptLists.append(newSlide);
+
         $('.slideName').focus().keypress(function(e) {
             if(e.which === 13) {
                 $('#slideName'+user.projectNum).text($(this).val());
@@ -79,7 +86,7 @@ $(document).ready(function(){
                 $('#'+pptURL).click(function(e){
                     console.log(pptURL)
                 })
-                socket.emit('newSlides', pptURL, pptImg, pptName, user);
+                socket.emit('newSlides', pptURL, pptImg, pptName, user, isNewSlide);
                 $(this).blur();
             }
         });

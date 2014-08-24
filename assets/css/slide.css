@@ -39,7 +39,7 @@ header{
 
 .canvas{
     width:950px;
-    height:530px;
+    height:534px;
     background: white;
     margin-left: 210px;
 }
@@ -98,10 +98,7 @@ header{
 
 .PPTtool3 img{
     float:left;
-    margin-left: 15px;
-    margin-right: 3px;
-    margin-top:8px;
-    margin-bottom:7px;
+    padding:10px;
     width:32px;
     height: 32px;
 }
@@ -120,6 +117,8 @@ header{
 .PPTtool4 img:hover{
     opacity: 0.3;
 }
+
+
 
 
 .division_line{
@@ -249,16 +248,19 @@ header{
     background: #202020;
     margin:20px;
     margin-right:50px;
-    margin-left:40px;
+    margin-left:30px;
     height:260px;
     overflow: auto;
 }
-#slideTable img{
+#slideTable div{
+    float: left;
+    background: white;
     margin:10px;
+    margin-left:18px;
     width :80px;
-    height :70px;
+    height :45px;
 }
-#slideTable img:hover{
+#slideTable div:hover{
     opacity: 0.8;
 }
 #sidebarBtn{
@@ -270,7 +272,9 @@ header{
     margin-right:50px;
     margin-left:30px;
     height:280px;
+    overflow: auto;
 }
+
 #chatMessage{
     background: #202020;
     margin-top:10px;

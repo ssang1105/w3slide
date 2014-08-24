@@ -7,6 +7,7 @@
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="../assets/js/sidebar.js"></script>
     <script type="text/javascript" src="../assets/js/slide.js"></script>
+    <!--<script type="text/javascript" src="../assets/js/slidelist.js"></script>-->
     <link rel="stylesheet" href="../assets/css/slide.css">
 </head>
 <body>
@@ -16,13 +17,6 @@
         <div class="slidelist">
             <img src="../assets/image/slide/sidebar/toggleBtn_1.png" id="sidebarBtn">
             <div id="slideTable">
-                <img src="../assets/image/index/samplePPT.png">
-                <img src="../assets/image/index/samplePPT.png">
-                <img src="../assets/image/index/samplePPT.png">
-                <img src="../assets/image/index/samplePPT.png">
-                <img src="../assets/image/index/samplePPT.png">
-                <img src="../assets/image/index/samplePPT.png">
-                <img src="../assets/image/index/samplePPT.png">
                 <!--슬라이드의 갯수를 받아와 슬라이드 이미지를 동적으로 뿌려주자-->
             </div>
 
@@ -53,8 +47,8 @@
     </header>
     <div class="toolmenu">
             <div class="PPTtool1" draggable="false">
-                <img src="../assets/image/slide/toolbar/del_slide.png" draggable="false">
                 <img src="../assets/image/slide/toolbar/add_slide.png" draggable="false">
+                <img src="../assets/image/slide/toolbar/del_slide.png" draggable="false">
             </div>
             <div class="division_line" draggable="false"></div>
             <div class="PPTtool2" draggable="false">
@@ -81,19 +75,23 @@
                 <img src="../assets/image/slide/toolbar/arrow_figure_2.png" id="simple_arrow2">
                 <img src="../assets/image/slide/toolbar/arrow_inter_1.png" id="inter_arrow1">
                 <img src="../assets/image/slide/toolbar/arrow_inter_2.png" id="inter_arrow2">
-                <img src="../assets/image/slide/toolbar/line.png" id="line" style=" margin-top:27px; width:40px; height: 5px;">
+                <img src="../assets/image/slide/toolbar/line.png" id="line" style=" margin-top:14px; margin-right:7px; width:29px; height: 4px;">
                 <img src="../assets/image/slide/toolbar/arrow_line.png" id="line_arrow">
             </div>
             <div class="division_line"></div>
             <div class="PPTtool4">
                 <img src="../assets/image/slide/toolbar/table.png" id="table">
-                <img src="../assets/image/slide/toolbar/uploadImage.png" id="uploadImage">
+                <div class="image-upload">
+                    <label for="file-input">
+                        <img src="../assets/image/slide/toolbar/uploadImage.png" id="uploadImage">
+                    </label>
+                    <input id="file-input" type="file" accept="image/*" style="display:none"/>
+                </div>
                 <img src="../assets/image/slide/toolbar/animation.png" id="animation">
             </div>
     </div>
 </div>
     <div class="canvas-container">
-        <div class="canvas"></div>
     </div>
 
 </body>
