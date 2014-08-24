@@ -8,7 +8,6 @@ $(document).ready(function(){
         btn_createPPT = $('#createPPT'),
         btn_uploadPPT = $('#uploadPPT'),
         pptLists = $('#pptLists'),
-        socket = io.connect('http://localhost:3000/'),
         userID = $('.profilePicture')[0].id,
         isNewSlide
 

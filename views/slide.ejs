@@ -6,8 +6,9 @@
     <script type="text/javascript" src="http://localhost:3000/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="../assets/js/sidebar.js"></script>
+    <script type="text/javascript" src="../assets/js/socket.js"></script>
+    <script type="text/javascript" src="../assets/js/header.js"></script>
     <script type="text/javascript" src="../assets/js/slide.js"></script>
-    <!--<script type="text/javascript" src="../assets/js/slidelist.js"></script>-->
     <link rel="stylesheet" href="../assets/css/slide.css">
 </head>
 <body>
@@ -27,7 +28,10 @@
                 <!--추가 됨-->
             </div>
             <div id="chatRoom"></div>
-            <div id="chatMessage"></div>
+            <div id="chatMessage">
+                <input type="text" id="data">
+                <input type="button" id="send" value="Send">
+            </div>
         </div>
         <div class="other_tool">
             <div id="toolList">
@@ -42,8 +46,8 @@
     <header>
         <div id="logo"  class="<%=pptURL%>"><a href><img src="../assets/image/index/logo.png" style="width:60%"></a></div>
         <div style="float: right;  background: #969696; min-width: 190px; max-height: 48px">
-            <p id="namespace"><%=namespace%></p>
-            <img src='<%=profileImage%>' id="<%=userID%>" class="profilePicture"></div>
+            <p id="namespace"></p>
+            <img src=" " class="profilePicture"></div>
     </header>
     <div class="toolmenu">
             <div class="PPTtool1" draggable="false">

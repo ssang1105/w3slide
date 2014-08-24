@@ -41,18 +41,18 @@
  */
 
 var svgContainer;
-var pageNum=0;
+var slideNum=0;
+
 $(document).ready(function(){
     var win = $(window),
         logo = $('#logo'),
         userList = $('#userList'),
         slide = $('.canvas'),
-        textboxBtn = $('#textbox'), rectBtn =  $('#rect'),  circleBtn = $('#circle'),   triangleBtn = $('#triangle'), simpleArrowBtn_1 =$('#simple_arrow1'),
+        textboxBtn = $('#textbox'), rectBtn =  $('#rect'),  circleBtn = $('#circle'),   triangleBtn = $('#triangle'), simpleArrowBtn_1 =$('#simple_arrow1'), uploadImageBtn = $('#uploadImage'),
         simpleArrowBtn_2=$('#simple_arrow2'), interArrowBtn_1 =$('#inter_arrow1'), interArrowBtn_2 = $('#inter_arrow2'), lineBtn = $('#line'), lineArrowBtn = $('#line_arrow'),
-        uploadImageBtn = $('#uploadImage'),
+
         userID = $('.profilePicture').attr('id'),
-        pptURL = $('#logo').attr('class'),
-        room = io.connect('/'+pptURL);
+        pptURL = $('#logo').attr('class')
 
     var textboxClickStatus, rectClickStatus, circleClickStatus, triangleClickStatus, simpleArrowClickStatus_1,
         simpleArrowClickStatus_2, interArrowClickStatus_1, interArrowClickStatus_2, lineClickStatus, lineArrowStatus;
@@ -60,49 +60,97 @@ $(document).ready(function(){
     // 나중에는 objectNum을 DB에서 관리하거나 아예 빼거나 하자
     var objectNum=0;
 
+    //----------------------------chattting-------------------------------
     win.load(function(){
         logo.css({
             left:win.innerWidth()/2-logo.width()/2
         })
+        socket.emit('joinroom',{room : pptURL, userID : userID, isSucess : false});
     })
 
-    room.emit('getSlideMembers',pptURL)
+
+
+
+    socket.on('updatechat', function(username, data) {
+        if(username === ''){
+            $("#chatRoom").append(data+'<br>');
+
+        }
+        else{
+            if(data !== ''){
+                $("#chatRoom").append('<b>'+username+':</b> '+data+'<br>');
+            }
+        }
+    });
+    socket.on('userlist',function(data){
+
+
+        $('#userList').empty();
+        if(data.isSucess){
+            for(var i=0;i<data.users.length;i++){
+                userList.append('<div><img src="'+data.users[i].profilePicture+'" class = "users" id="'+data.users[i].id+'"></div>')
+            }
+        }
+        else{
+            $('#+data.users[i].id+').hover();
+
+            console.log('WuRIWURIHAN')
+        }
+
+    });
+    $(function() {
+        $("#send").click( function() {
+            var message = $("#data").val();
+            $("#data").val('');
+            socket.emit('send_msg', message);
+        });
+
+        $("#data").keypress(function(e) {
+            if (e.which == 13){
+                $(this).blur();
+                $("#send").click();
+                $("#data").focus();
+            }
+        });
+    });
+    // 나갈때..
+    win.on('beforeunload',function(){
+
+
+        socket.emit('disconnect',{pptURL:pptURL, userID:userID, isSucess:false});
+
+    })
+//----------------------------chattting-------------------------------
 
     /*
      *  슬라이드의 멤버 불러오기
      */
-    room.on('slideMembers', function(members, isNewSlide){
-
-        console.log('Is this PPT new one? ' + isNewSlide)
-        // 멤버의 수만큼 동적으로 뿌려주기
-        for(var i=0; i<members.length; i++){
-            userList.append('<div><img src="'+ members[i].profilePicture+'" class = "users" id="'+members[i].id+'"></div>')
-        }
+    socket.emit('getSlideMembers',pptURL)
+    socket.on('slideMembers', function(members, isNewSlide){
         //  *************** 새로운 슬라이드일 경우 ***************    //
         if(isNewSlide){
             $('.canvas-container').append('<div class="canvas" id="canvas0"></div>')
-            svgContainer = d3.select('#canvas'+pageNum+'').append('svg')
+            svgContainer = d3.select('#canvas'+slideNum+'').append('svg')
                 .attr('viewBox','0 0 ' + $('.canvas').width() +' '+$('.canvas').height())
-                .attr('id', 'slideSVG'+pageNum+'')
-            $('#slideTable').append('<div><svg id="cloneSlide'+pageNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+pageNum+'"></use></div>')
+                .attr('id', 'slideSVG'+slideNum+'')
+            $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
             var jsonSlide = JSON.stringify({  data:$('.canvas-container').html() })
-//            var jsonCloneSlide = JSON.stringify({ data:$('#slideTable').html() })
-            room.emit('saveSlide',pptURL, jsonSlide, pageNum);
+            socket.emit('saveSlide',pptURL, jsonSlide, slideNum);
         }
         //  *************** 기존에 불러온 슬라이드일 경우 ***************    //
         else{
             console.log('load Exist Slide')
-            room.emit('getExistSlideSVG', pptURL)
-            room.on('slideSVG', function(pptContents){
+            socket.emit('getExistSlideSVG', pptURL)
+            socket.on('slideSVG', function(pptContents){
                 console.log(jQuery.parseJSON(pptContents).data)
-                $('#canvas0').remove()
+//                $('#canvas0').remove()
                 $('.canvas-container').append(jQuery.parseJSON(pptContents).data);
-                svgContainer = d3.select('#slideSVG'+pageNum+'')
-                    .attr('id', 'slideSVG'+pageNum+'')
+                svgContainer = d3.select('#slideSVG'+slideNum+'')
+                    .attr('id', 'slideSVG'+slideNum+'')
                 console.log(svgContainer)
 //                $(''+$('#cloneSlide0')+'').remove()
-                $('#slideTable').append('<div><svg id="cloneSlide'+pageNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+pageNum+'"></use></div>')
-                slideSetting();
+                $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
+                slideSe3tting();
             })
             // ppt contents의 length만큼 뿌리자. ppt contents의 length만큼 id값을 ++
             // oldSlide 인 경우 pptContents의 갯수만큼 canvas-container.Append canvas + pptContents[i]
@@ -157,15 +205,15 @@ $(document).ready(function(){
                                 .attr("y", $('.canvas').height()/2-150)
                                 .attr("width", 200)
                                 .attr("height", 200)
-                                .attr("class", 'drawnImage')
+                                .attr("class", 'drawnObject')
                                 .attr("id", 'object'+objectNum)
                                 .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                                 .on("mouseout", function(){d3.select(this).style("cursor", "default");});
-
+8
                             if(drawnObject){
                                 drawnObject_class = drawnObject.attr('class');
                                 drawnObject_id = drawnObject.attr('id');
-                                object_added(drawnObject_class, drawnObject_id);
+                                callback(drawnObject_class, drawnObject_id);
                             }
                         }
 
@@ -184,7 +232,7 @@ $(document).ready(function(){
                     .attr("font-family", "sans-serif")
                     .attr("font-size", "20px")
                     .attr("fill","black")
-                    .attr("class", 'drawnText')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");})
@@ -197,7 +245,7 @@ $(document).ready(function(){
                     .attr("width", 100)
                     .attr("height", 100)
                     .attr("style", "fill:#5B9BD5; stroke-width:1; stroke:rgb(0,0,0)")
-                    .attr("class", 'drawnRect')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -208,7 +256,7 @@ $(document).ready(function(){
                     .attr("cy", e.offsetY+40)
                     .attr("r", 50)
                     .attr("style", "fill:#5B9BD5; stroke-width:1; stroke:rgb(0,0,0)")
-                    .attr("class", 'drawnCircle')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -222,7 +270,7 @@ $(document).ready(function(){
                     .attr("stroke", "black")
                     .attr("stroke-width", 1)
                     .attr("fill", "#5B9BD5")
-                    .attr("class", 'drawnTriangle')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -236,7 +284,7 @@ $(document).ready(function(){
                     .attr("stroke", "black")
                     .attr("stroke-width", 1)
                     .attr("fill", "#5B9BD5")
-                    .attr("class", 'drawSimpleArrow_1')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -251,7 +299,7 @@ $(document).ready(function(){
                     .attr("stroke-width", 1)
                     .attr("transform", "rotate(90 "+ e.offsetX+" "+ e.offsetY+")")
                     .attr("fill", "#5B9BD5")
-                    .attr("class", 'drawSimpleArrow_2')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -266,7 +314,7 @@ $(document).ready(function(){
                     .attr("stroke", "black")
                     .attr("stroke-width", 1)
                     .attr("fill", "#5B9BD5")
-                    .attr("class", 'drawInterArrow_1')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -281,7 +329,7 @@ $(document).ready(function(){
                     .attr("stroke-width", 1)
                     .attr("transform", "rotate(90 "+ e.offsetX+" "+ e.offsetY+")")
                     .attr("fill", "#5B9BD5")
-                    .attr("class", 'drawInterArrow_2')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -294,7 +342,7 @@ $(document).ready(function(){
                     .attr("stroke-width", 1)
                     .attr("transform", "rotate(45 "+ e.offsetX+" "+ e.offsetY+")")
                     .attr("fill", "#5B9BD5")
-                    .attr("class", 'drawnLine')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -308,7 +356,7 @@ $(document).ready(function(){
                     .attr("stroke-width", 1)
                     .attr("transform", "rotate(45 "+ e.offsetX+" "+ e.offsetY+")")
                     .attr("fill", "#5B9BD5")
-                    .attr("class", 'drawnLineArrow')
+                    .attr("class", 'drawnObject')
                     .attr("id", 'object'+objectNum)
                     .on("mouseover", function(){d3.select(this).style("cursor", "move");})
                     .on("mouseout", function(){d3.select(this).style("cursor", "default");});
@@ -319,6 +367,7 @@ $(document).ready(function(){
                 drawnObject_id = drawnObject.attr('id');
                 callback(drawnObject_class,drawnObject_id);
             }
+
             $('.canvas').css({ cursor:'default'})
         };
 
@@ -331,6 +380,7 @@ $(document).ready(function(){
         $('.canvas').mousedown(function(e){
 
         }).mouseup(function(e){
+                console.log(e.offsetX, e.offsetY)
                 console.log($('.canvas'))
                drawByClick(e, object_added)
                allFlagFalse();
@@ -351,7 +401,7 @@ $(document).ready(function(){
             console.log(objectID)
             console.log(e)
             var jsonSlide = JSON.stringify({  data:$('.canvas-container').html() })
-            room.emit('saveSlide',pptURL, jsonSlide);
+            socket.emit('saveSlide',pptURL, jsonSlide);
 
         }
     }

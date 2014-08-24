@@ -188,8 +188,59 @@ mongoose.connect('mongodb://localhost/mydb',function(err){
         throw err;
     }
 });
+
+
+
 io.sockets.on('connection', function (socket) {
     console.log('Socket Connected');
+    //==========================chat!!====================================
+
+    socket.on('joinroom',function(data){
+        Users.findOne({'id':data.userID},function(err,user){
+            if(err) throw err;
+            PPTs.findOne({'url':data.room},function(err,ppt){
+                if(err) throw  err;
+                for(var j=0; j<ppt.members.length; j++)
+                {
+                    if(user.id!=ppt.members[j].id){
+
+                        ppt.members.push({name : user.username,profilePicture:user.profilePicture,email:user.email,id:user.id});
+                        ppt.save();
+                        break;
+                    }
+                }
+                var room = data.room;
+                var username= user.username;
+                socket.join(room);
+                socket.room=room;
+                socket.id=data.userID;
+                socket.username = username;
+                data.isSucess=true;
+
+                var data1 = ('님이 입장하였습니다');
+                io.sockets.in(socket.room).emit('updatechat',username,data1);
+                io.sockets.in(socket.room).emit('userlist', {users :ppt.members,userID :user.id,isSucess :true});
+                socket.emit('userprofilepic',user);
+
+            });
+        });
+    });
+
+    socket.on('leaveroom',function(data){
+        console.log('nickname ' + socket.username + ' has been disconnected');
+        var data1 = (socket.username + ' 님이 나가셨습니다.');
+        io.sockets.in(socket.room).emit('updatechat',socket.username,data1);
+        io.sockets.in(socket.room).emit('userlist',{userURL :data.pptURL, userID : data.userID,isSucess:false});
+        socket.leave(socket.room);
+
+    });
+
+
+    socket.on('send_msg', function(data) {
+        io.sockets.in(socket.room).emit('updatechat', socket.username, data);
+    });
+
+    //==========================chat!!==================================== //
 
     socket.on('createSlide', function(userID, isNewSlide){
         Users.findOne({'id':userID},function(err,user){
@@ -202,7 +253,6 @@ io.sockets.on('connection', function (socket) {
             console.log('Create Slide')
             socket.emit('slideInfo', user, isNewSlide);
         })
-
     });
     socket.on('newSlides', function(pptURL, pptImg, pptName, user){
         console.log('New Slides')
@@ -229,28 +279,30 @@ io.sockets.on('connection', function (socket) {
                 if(err) throw err;
             });
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-                var someSlide = io.of('/'+pptURL).on('connection', function(room){
-                    console.log(user.username + ' connect to Room ' + pptURL);
+                res.render('slide', { pptURL:pptURL });
+            });
+        });
+    });
 
-                    room.on('getSlideMembers', function(pptURL){
-                        PPTs.findOne({'url':pptURL}, function(err,ppt){
-                            if(err) throw err;
-                            room.emit('slideMembers',ppt.members, ppt.isNewSlide)
-                        })
-                    });
+    socket.on('getSlideMembers', function(pptURL){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            if(err) throw err;
+            socket.emit('slideMembers',ppt.members, ppt.isNewSlide)
+        })
+    });
 
-                    room.on('saveSlide', function(pptURL, jsonSlide, pageNum){
-                        PPTs.findOne({'url':pptURL}, function(err,ppt){
-                            if (err) throw err;
-                            ppt.isNewSlide = false;
+    socket.on('saveSlide', function(pptURL, jsonSlide, pageNum){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            if (err) throw err;
+            ppt.isNewSlide = false;
 
-                            // mongoose array의 특정 index에 jsonSlide를 못넣어.. sub document
+            // mongoose array의 특정 index에 jsonSlide를 못넣어.. sub document
 
-                            ppt.pptContents.$pop();
-                            ppt.pptContents.push({
-                                slide: jsonSlide
-                            });
-                            ppt.save();
+            ppt.pptContents.$pop();
+            ppt.pptContents.push({
+                slide: jsonSlide
+            });
+            ppt.save();
 //
 //                            ppt.pptContents.update(
 //                                {},
@@ -264,9 +316,9 @@ io.sockets.on('connection', function (socket) {
 //
 //                                });
 
-                            console.log('***********')
-                            console.log(ppt.pptContents)
-                            console.log('***********')
+            console.log('***********')
+            console.log(ppt.pptContents)
+            console.log('***********')
 
 //                            ppt.pptContents.set(pageNum, subdoc);
 
@@ -281,30 +333,17 @@ io.sockets.on('connection', function (socket) {
 //                            });
 //                            ppt.update();
 //                            console.log(ppt.pptContents[0])
-                        })
-                    })
-                    room.on('getExistSlideSVG', function(pptURL){
-                        console.log(pptURL)
-                        PPTs.findOne({'url':pptURL}, function(err,ppt){
-                            if(err) throw err;
-                            console.log(ppt.pptContents[0].slide)
-                            console.log('****************************')
-                            room.emit('slideSVG',ppt.pptContents[0].slide)
-                        })
-                    })
-
-
-
-                    room.on('disconnect', function(){
-                        // 어둡게하는 .css({ opacitiy : 0.3 })
-                        console.log("Room Socket Disconnected");
-                    });
-
-                });
-                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id, pptURL:pptURL });
-            });
-        });
-    });
+        })
+    })
+    socket.on('getExistSlideSVG', function(pptURL){
+        console.log(pptURL)
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            if(err) throw err;
+            console.log(ppt.pptContents[0].slide)
+            console.log('****************************')
+            socket.emit('slideSVG',ppt.pptContents[0].slide)
+        })
+    })
 
     socket.on('getUsersPPT',function(userID){
         // PPT members의 id 중 userID와 일치하는 members를 찾아서 뿌려주기.
@@ -317,61 +356,24 @@ io.sockets.on('connection', function (socket) {
         });
     });
     socket.on('loadExistSlide',function(pptURL, userID){
-
-
         Users.findOne({'id':userID},function(err,user){
             if(err) throw err;
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-                var someSlide = io.of('/'+pptURL).on('connection', function(room){
-                    console.log(user.username + ' connect to Room ' + pptURL);
-
-                    room.on('getSlideMembers', function(pptURL){
-
-                        PPTs.findOne({'url':pptURL}, function(err,ppt){
-                            if(err) throw err;
-                            room.emit('slideMembers',ppt.members, ppt.isNewSlide)
-                        })
-                    });
-
-                    room.on('saveSlide', function(pptURL, jsonSlide){
-                        PPTs.findOne({'url':pptURL}, function(err,ppt){
-                            if (err) throw err;
-                            ppt.isNewSlide = false;
-                            ppt.update({
-                                pptContents : {$push: {'slide' : jsonSlide}}
-                            })
-
-                            ppt.update();
-                            console.log(ppt.pptContents)
-                        })
-                    })
-
-                    room.on('getExistSlideSVG', function(pptURL){
-                        console.log(pptURL)
-                        PPTs.findOne({'url':pptURL}, function(err,ppt){
-                            if(err) throw err;
-                            console.log(ppt.pptContents)
-                            console.log('****************************')
-                            room.emit('slideSVG',ppt.pptContents)
-                        })
-                    })
-
-
-                    room.on('disconnect', function(){
-                        // 어둡게하는 .css({ opacitiy : 0.3 })
-                        console.log("Room Socket Disconnected");
-                    });
-
-                });
-                res.render('slide', { profileImage : user.profilePicture, namespace:user.username, userID:user.id, pptURL:pptURL });
+                res.render('slide', { pptURL:pptURL });
             });
         })
     });
 
     socket.on('disconnect', function(){
         console.log("Socket Disconnected");
-    })
+        io.sockets.emit('updateusers',socket.username);
+        socket.leave(socket.room);
+    });
+
 });
+
+
+
 
 /*
     서버가 켜지면 PPT Schema에 있는 pptURL들을 모두를 열어
