@@ -37,7 +37,7 @@
  *  단순히 class에 이벤트를 주면 안돼 (export된 Object는 안잡히니깐)
  *  export된 Object의 특징을 찾아야 해.
  *  정 안되면.... 선택박스만드는걸 포기하는게 나을듯.
- *
+ *                                                                              // slideNum, objectNum 관리에 대해 다시 생각해보자
  */
 
 var svgContainer;
@@ -50,6 +50,7 @@ $(document).ready(function(){
         slide = $('.canvas'),
         textboxBtn = $('#textbox'), rectBtn =  $('#rect'),  circleBtn = $('#circle'),   triangleBtn = $('#triangle'), simpleArrowBtn_1 =$('#simple_arrow1'), uploadImageBtn = $('#uploadImage'),
         simpleArrowBtn_2=$('#simple_arrow2'), interArrowBtn_1 =$('#inter_arrow1'), interArrowBtn_2 = $('#inter_arrow2'), lineBtn = $('#line'), lineArrowBtn = $('#line_arrow'),
+        addSlideBtn = $('#addSlide'), delSlideBtn = $('#delSlide')
 
         userID = $('.profilePicture').attr('id'),
         pptURL = $('#logo').attr('class')
@@ -62,39 +63,31 @@ $(document).ready(function(){
 
     //----------------------------chattting-------------------------------
     win.load(function(){
-        logo.css({
-            left:win.innerWidth()/2-logo.width()/2
-        })
+        logo.css({ left:win.innerWidth()/2-logo.width()/2 })
         socket.emit('joinroom',{room : pptURL, userID : userID, isSucess : false});
+        /* 추가할 부분 : 첫번째 PPT가 선택이 되도록(보여주도록)*/
     })
-
-
-
-
+    socket.emit('getSlideMembers',pptURL)
     socket.on('updatechat', function(username, data) {
-        if(username === ''){
-            $("#chatRoom").append(data+'<br>');
 
-        }
+
+        if(username === '')
+            $("#chatRoom").append(data+'<br>');
         else{
-            if(data !== ''){
+            if(data !== '')
                 $("#chatRoom").append('<b>'+username+':</b> '+data+'<br>');
-            }
         }
     });
     socket.on('userlist',function(data){
-
-
         $('#userList').empty();
         if(data.isSucess){
             for(var i=0;i<data.users.length;i++){
                 userList.append('<div><img src="'+data.users[i].profilePicture+'" class = "users" id="'+data.users[i].id+'"></div>')
             }
+            $('#'+data.users.id).css({ opacity : 1.0})
         }
-        else{
-            $('#+data.users[i].id+').hover();
-
-            console.log('WuRIWURIHAN')
+        else if(data.isSucess==false){
+            $('#'+data.users.id).css({ opacity : 0.3})
         }
 
     });
@@ -125,7 +118,6 @@ $(document).ready(function(){
     /*
      *  슬라이드의 멤버 불러오기
      */
-    socket.emit('getSlideMembers',pptURL)
     socket.on('slideMembers', function(members, isNewSlide){
         //  *************** 새로운 슬라이드일 경우 ***************    //
         if(isNewSlide){
@@ -136,29 +128,30 @@ $(document).ready(function(){
             $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
             var jsonSlide = JSON.stringify({  data:$('.canvas-container').html() })
             socket.emit('saveSlide',pptURL, jsonSlide, slideNum);
+            slideSetting()
         }
         //  *************** 기존에 불러온 슬라이드일 경우 ***************    //
         else{
             console.log('load Exist Slide')
             socket.emit('getExistSlideSVG', pptURL)
             socket.on('slideSVG', function(pptContents){
-                console.log(jQuery.parseJSON(pptContents).data)
-//                $('#canvas0').remove()
                 $('.canvas-container').append(jQuery.parseJSON(pptContents).data);
                 svgContainer = d3.select('#slideSVG'+slideNum+'')
                     .attr('id', 'slideSVG'+slideNum+'')
-                console.log(svgContainer)
-//                $(''+$('#cloneSlide0')+'').remove()
                 $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
-                slideSe3tting();
+//                $('#slideTable div').css("display", "block")
+                slideSetting();
             })
             // ppt contents의 length만큼 뿌리자. ppt contents의 length만큼 id값을 ++
             // oldSlide 인 경우 pptContents의 갯수만큼 canvas-container.Append canvas + pptContents[i]
 
 
         }
-        slideSetting()
+
     })
+
+
+
 
     /*
      *       SVG를 이용한 PowerPoint Editor
@@ -184,47 +177,64 @@ $(document).ready(function(){
 
 
 
+
+    addSlideBtn.click(function(e){
+        slideNum++;
+        $('.canvas-container div').css('display','none');
+        $('.canvas-container').append('<div class="canvas" id="canvas'+slideNum+'"></div>')
+        svgContainer = d3.select('#canvas'+slideNum+'').append('svg')
+            .attr('viewBox','0 0 ' + $('.canvas').width() +' '+$('.canvas').height())
+            .attr('id', 'slideSVG'+slideNum+'')
+        $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
+        $('#cloneSlide'+slideNum).click(function(){
+            var slide=$('#cloneSlide'+slideNum).children().attr('xlink:href');
+            console.log(slide)
+            $('.canvas-container div').css('display','none');
+            console.log($(slide))
+            console.log($(slide).parent())
+            $(slide).parent().css('display','none')
+        })
+
+        var jsonSlide = JSON.stringify({  data:$('.canvas-container').html() })
+        socket.emit('saveSlide',pptURL, jsonSlide, slideNum);
+        slideSetting();
+    });
+
     function slideSetting(){
 
+        uploadImageBtn.click(function(e){
+            document.getElementById('file-input').onchange = function handleImage(e){
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    var imgObj = new Image();
+                    imgObj.src = event.target.result;
+                    imgObj.onload = function () {
+                        console.log(svgContainer)
+                        var drawnObject = svgContainer.append("image")
+                            .attr("xlink:href", event.target.result)
+                            .attr("x", $('.canvas').width()/2-150)
+                            .attr("y", $('.canvas').height()/2-150)
+                            .attr("width", 200)
+                            .attr("height", 200)
+                            .attr("class", 'drawnObject')
+                            .attr("id", 'object'+objectNum)
+                            .on("mouseover", function(){d3.select(this).style("cursor", "move");})
+                            .on("mouseout", function(){d3.select(this).style("cursor", "default");});
+                        if(drawnObject){
+                            drawnObject_class = drawnObject.attr('class');
+                            drawnObject_id = drawnObject.attr('id');
+                            object_added(drawnObject_class, drawnObject_id);
+                        }
+                    }
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        })
 
         function drawByClick(e, callback){
-
             var drawnObject;
 
-            uploadImageBtn.click(function(e){
-                document.getElementById('file-input').onchange = function handleImage(e){
-                    var reader = new FileReader();
-                    reader.onload = function (event) {
-                        var imgObj = new Image();
-                        imgObj.src = event.target.result;
-                        imgObj.onload = function () {
-                            console.log(svgContainer)
-                            var drawnObject = svgContainer.append("image")
-                                .attr("xlink:href", event.target.result)
-                                .attr("x", $('.canvas').width()/2-150)
-                                .attr("y", $('.canvas').height()/2-150)
-                                .attr("width", 200)
-                                .attr("height", 200)
-                                .attr("class", 'drawnObject')
-                                .attr("id", 'object'+objectNum)
-                                .on("mouseover", function(){d3.select(this).style("cursor", "move");})
-                                .on("mouseout", function(){d3.select(this).style("cursor", "default");});
-8
-                            if(drawnObject){
-                                drawnObject_class = drawnObject.attr('class');
-                                drawnObject_id = drawnObject.attr('id');
-                                callback(drawnObject_class, drawnObject_id);
-                            }
-                        }
-
-
-                    }
-                    reader.readAsDataURL(e.target.files[0]);
-                }
-            })
-
             if(textboxClickStatus==true){
-
                 drawnObject = svgContainer.append("text")
                     .attr("x", e.offsetX)
                     .attr("y", e.offsetY)

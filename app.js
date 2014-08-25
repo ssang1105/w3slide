@@ -200,12 +200,19 @@ io.sockets.on('connection', function (socket) {
             if(err) throw err;
             PPTs.findOne({'url':data.room},function(err,ppt){
                 if(err) throw  err;
-                for(var j=0; j<ppt.members.length; j++)
-                {
-                    if(user.id!=ppt.members[j].id){
-
+                var oldUser = false;
+                var pptMembersLength =ppt.members.length
+                for(var j=0; j<pptMembersLength; j++){
+                    for(var i=0; i<pptMembersLength; i++)
+                        if(user.id==ppt.members[i].id){
+                            oldUser=true;
+                            break;
+                        }
+                    if(oldUser==false){
                         ppt.members.push({name : user.username,profilePicture:user.profilePicture,email:user.email,id:user.id});
                         ppt.save();
+                        user.projectList.push(ppt);
+                        user.save();
                         break;
                     }
                 }
@@ -219,7 +226,7 @@ io.sockets.on('connection', function (socket) {
 
                 var data1 = ('님이 입장하였습니다');
                 io.sockets.in(socket.room).emit('updatechat',username,data1);
-                io.sockets.in(socket.room).emit('userlist', {users :ppt.members,userID :user.id,isSucess :true});
+                io.sockets.in(socket.room).emit('userlist', {users :ppt.members,userID :user.id, isSucess :true});
                 socket.emit('userprofilepic',user);
 
             });
@@ -317,7 +324,7 @@ io.sockets.on('connection', function (socket) {
 //                                });
 
             console.log('***********')
-            console.log(ppt.pptContents)
+//            console.log(ppt.pptContents)
             console.log('***********')
 
 //                            ppt.pptContents.set(pageNum, subdoc);
@@ -339,8 +346,6 @@ io.sockets.on('connection', function (socket) {
         console.log(pptURL)
         PPTs.findOne({'url':pptURL}, function(err,ppt){
             if(err) throw err;
-            console.log(ppt.pptContents[0].slide)
-            console.log('****************************')
             socket.emit('slideSVG',ppt.pptContents[0].slide)
         })
     })
@@ -362,6 +367,10 @@ io.sockets.on('connection', function (socket) {
                 res.render('slide', { pptURL:pptURL });
             });
         })
+    });
+
+    socket.on('addNewSlide', function(slideNum){
+
     });
 
     socket.on('disconnect', function(){
