@@ -209,6 +209,9 @@ header{
 #userList{
     float:right;
 }
+#userList div img{
+    opacity: 0.3;
+}
 .users{
     width: 48px;
     height: 48px;
@@ -257,7 +260,7 @@ header{
     background: white;
     margin:10px;
     margin-left:18px;
-    width :80px;
+    width :79px;
     height :45px;
 }
 #slideTable div:hover{

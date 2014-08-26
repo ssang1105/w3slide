@@ -41,7 +41,7 @@
  */
 
 var svgContainer;
-var slideNum=0;
+var slideNum=1;
 
 $(document).ready(function(){
     var win = $(window),
@@ -52,8 +52,8 @@ $(document).ready(function(){
         simpleArrowBtn_2=$('#simple_arrow2'), interArrowBtn_1 =$('#inter_arrow1'), interArrowBtn_2 = $('#inter_arrow2'), lineBtn = $('#line'), lineArrowBtn = $('#line_arrow'),
         addSlideBtn = $('#addSlide'), delSlideBtn = $('#delSlide')
 
-        userID = $('.profilePicture').attr('id'),
-        pptURL = $('#logo').attr('class')
+        var userID = $('.profilePicture').attr('id'),
+            pptURL = $('#logo').attr('class')
 
     var textboxClickStatus, rectClickStatus, circleClickStatus, triangleClickStatus, simpleArrowClickStatus_1,
         simpleArrowClickStatus_2, interArrowClickStatus_1, interArrowClickStatus_2, lineClickStatus, lineArrowStatus;
@@ -66,11 +66,22 @@ $(document).ready(function(){
         logo.css({ left:win.innerWidth()/2-logo.width()/2 })
         socket.emit('joinroom',{room : pptURL, userID : userID, isSucess : false});
         /* 추가할 부분 : 첫번째 PPT가 선택이 되도록(보여주도록)*/
+        svgContainer = d3.select('#canvas1').append('svg')
+            .attr('viewBox','0 0 ' + $('.canvas').width() +' '+$('.canvas').height());
+        socket.emit('getAmountSlideNum', pptURL);
+        slideSetting();
     })
+
+    function initSetting(){
+
+        $('.canvas-container div div').css('display','none');
+        $('#canvas1').css('display','block');
+        $('#slideTable div svg').css({border:'none'})
+        $('#cloneSlide1').css({border:'solid red'})
+
+    }
     socket.emit('getSlideMembers',pptURL)
     socket.on('updatechat', function(username, data) {
-
-
         if(username === '')
             $("#chatRoom").append(data+'<br>');
         else{
@@ -80,15 +91,14 @@ $(document).ready(function(){
     });
     socket.on('userlist',function(data){
         $('#userList').empty();
-        if(data.isSucess){
-            for(var i=0;i<data.users.length;i++){
-                userList.append('<div><img src="'+data.users[i].profilePicture+'" class = "users" id="'+data.users[i].id+'"></div>')
+        for(var i=0;i<data.users.length;i++){
+            if(data.users[i].isLogin==true)
+                userList.append('<div><img style="opacity: 1.0" src="'+data.users[i].profilePicture+'" class = "users" id="'+data.users[i].id+'"></div>')
+            else if(data.users[i].isLogin==false){
+                userList.append('<div><img style="opacity: 0.3" src="'+data.users[i].profilePicture+'" class = "users" id="'+data.users[i].id+'"></div>')
             }
-            $('#'+data.users.id).css({ opacity : 1.0})
         }
-        else if(data.isSucess==false){
-            $('#'+data.users.id).css({ opacity : 0.3})
-        }
+        initSetting();
 
     });
     $(function() {
@@ -108,44 +118,69 @@ $(document).ready(function(){
     });
     // 나갈때..
     win.on('beforeunload',function(){
-
-
-        socket.emit('disconnect',{pptURL:pptURL, userID:userID, isSucess:false});
-
+        socket.emit('leaveroom',{pptURL:pptURL, userID:userID, isSucess:false});
     })
 //----------------------------chattting-------------------------------
 
-    /*
-     *  슬라이드의 멤버 불러오기
-     */
     socket.on('slideMembers', function(members, isNewSlide){
         //  *************** 새로운 슬라이드일 경우 ***************    //
+        localStorage.setItem('slideNum', 1);
+        slideNum=localStorage.getItem('slideNum');
+        console.log(slideNum)
         if(isNewSlide){
-            $('.canvas-container').append('<div class="canvas" id="canvas0"></div>')
+            $('.canvas-container').append('<div id="canvasCon'+slideNum+'"><div class="canvas" id="canvas'+slideNum+'"></div></div>')
             svgContainer = d3.select('#canvas'+slideNum+'').append('svg')
                 .attr('viewBox','0 0 ' + $('.canvas').width() +' '+$('.canvas').height())
                 .attr('id', 'slideSVG'+slideNum+'')
             $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
-            var jsonSlide = JSON.stringify({  data:$('.canvas-container').html() })
+            var jsonSlide = JSON.stringify({  data:$('#canvasCon'+slideNum+'').html() });
             socket.emit('saveSlide',pptURL, jsonSlide, slideNum);
+            $('#cloneSlide'+slideNum).click(function(){
+                var clickedSlideMini = $(this).attr('id')
+                var clickedSlideSVG = $(this).children().attr('xlink:href');
+                $('.canvas-container div div').css('display','none');
+                $(clickedSlideSVG).parent().css('display','block');
+                svgContainer = d3.select(clickedSlideSVG)
+                $('#slideTable div svg').css({border:'none'})
+                $('#'+clickedSlideMini).css({border:'solid red'})
+                var str=clickedSlideSVG;
+                slideNum=str.split("#slideSVG")[1];
+            })
             slideSetting()
         }
-        //  *************** 기존에 불러온 슬라이드일 경우 ***************    //
+        // ************** 기존에 불러온 슬라이드일 경우 ***************    //
         else{
             console.log('load Exist Slide')
             socket.emit('getExistSlideSVG', pptURL)
             socket.on('slideSVG', function(pptContents){
-                $('.canvas-container').append(jQuery.parseJSON(pptContents).data);
+                for(var i=0; i<pptContents.length; i++){
+                    console.log(slideNum)
+                    j=i+1;
+                    $('.canvas-container').append('<div id="canvasCon'+j+'">' + jQuery.parseJSON(pptContents[i]).data + '</div>');
+                }
+                slideNum = 1;
                 svgContainer = d3.select('#slideSVG'+slideNum+'')
-                    .attr('id', 'slideSVG'+slideNum+'')
-                $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
-//                $('#slideTable div').css("display", "block")
+                   .attr('id', 'slideSVG'+slideNum+'')
+
+                for(var i=1; i<=pptContents.length;i++){
+                    $('#slideTable').append('<div><svg id="cloneSlide'+i+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+i+'"></use></div>')
+                    $('#cloneSlide'+i).click(function(){
+                        var clickedSlideMini = $(this).attr('id')
+                        var clickedSlideSVG = $(this).children().attr('xlink:href');
+                        $('.canvas-container div div').css('display','none');
+                        $(clickedSlideSVG).parent().css('display','block');
+                        svgContainer = d3.select(clickedSlideSVG)
+                        $('#slideTable div svg').css({border:'none'})
+                        $('#'+clickedSlideMini).css({border:'solid red'})
+                        var str=clickedSlideSVG;
+                        slideNum=str.split("#slideSVG")[1];
+                    })
+                }
+                $('.canvas-container div div').css('display','none');
+                $('#cloneSlide1').css({border:'solid red'})
+                $('#slideSVG1').parent().css({display:"block"})
                 slideSetting();
             })
-            // ppt contents의 length만큼 뿌리자. ppt contents의 length만큼 id값을 ++
-            // oldSlide 인 경우 pptContents의 갯수만큼 canvas-container.Append canvas + pptContents[i]
-
-
         }
 
     })
@@ -164,44 +199,57 @@ $(document).ready(function(){
                               .interpolate("linear");
 
 
-    textboxBtn.click(function(e){ textboxClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
-    rectBtn.click(function(e){ rectClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
-    circleBtn.click(function(e){ circleClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
-    triangleBtn.click(function(e){ triangleClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
-    simpleArrowBtn_1.click(function(e){ simpleArrowClickStatus_1=true; $('.canvas').css({ cursor:'crosshair'}) })
-    simpleArrowBtn_2.click(function(e){ simpleArrowClickStatus_2=true; $('.canvas').css({ cursor:'crosshair'}) })
-    interArrowBtn_1.click(function(e){ interArrowClickStatus_1=true; $('.canvas').css({ cursor:'crosshair'}) })
-    interArrowBtn_2.click(function(e){ interArrowClickStatus_2=true; $('.canvas').css({ cursor:'crosshair'}) })
-    lineBtn.click(function(e){ lineClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
-    lineArrowBtn.click(function(e){ lineArrowStatus=true; slide.css({ cursor:'crosshair'}) })
+    textboxBtn.click(function(e){ allFlagFalse(); textboxClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
+    rectBtn.click(function(e){ allFlagFalse(); rectClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
+    circleBtn.click(function(e){ allFlagFalse(); circleClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
+    triangleBtn.click(function(e){ allFlagFalse(); triangleClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
+    simpleArrowBtn_1.click(function(e){ allFlagFalse(); simpleArrowClickStatus_1=true; $('.canvas').css({ cursor:'crosshair'}) })
+    simpleArrowBtn_2.click(function(e){ allFlagFalse(); simpleArrowClickStatus_2=true; $('.canvas').css({ cursor:'crosshair'}) })
+    interArrowBtn_1.click(function(e){ allFlagFalse(); interArrowClickStatus_1=true; $('.canvas').css({ cursor:'crosshair'}) })
+    interArrowBtn_2.click(function(e){ allFlagFalse(); interArrowClickStatus_2=true; $('.canvas').css({ cursor:'crosshair'}) })
+    lineBtn.click(function(e){ allFlagFalse(); lineClickStatus=true; $('.canvas').css({ cursor:'crosshair'}) })
+    lineArrowBtn.click(function(e){ allFlagFalse(); lineArrowStatus=true; slide.css({ cursor:'crosshair'}) })
 
 
 
+    socket.on('amountSlideNum', function(slideNum){
+        console.log('amountSlideNum : ' + slideNum)
+        localStorage.setItem('slideNum', slideNum);
+    })
 
-    addSlideBtn.click(function(e){
-        slideNum++;
-        $('.canvas-container div').css('display','none');
-        $('.canvas-container').append('<div class="canvas" id="canvas'+slideNum+'"></div>')
+    addSlideBtn.mousedown(function(e){
+        socket.emit('getAmountSlideNum', pptURL);
+    })
+    addSlideBtn.mouseup(function(e){
+        slideNum=localStorage.getItem('slideNum')
+        slideNum++
+        var jsonSlide;
+        $('.canvas-container div div').css('display','none');
+        console.log(slideNum)
+        $('.canvas-container').append('<div id="canvasCon'+slideNum+'"><div class="canvas" id="canvas'+slideNum+'"></div></div>')
         svgContainer = d3.select('#canvas'+slideNum+'').append('svg')
             .attr('viewBox','0 0 ' + $('.canvas').width() +' '+$('.canvas').height())
             .attr('id', 'slideSVG'+slideNum+'')
         $('#slideTable').append('<div><svg id="cloneSlide'+slideNum+'" viewbox="0 0 80 45"><use xlink:href="#slideSVG'+slideNum+'"></use></div>')
-        $('#cloneSlide'+slideNum).click(function(){
-            var slide=$('#cloneSlide'+slideNum).children().attr('xlink:href');
-            console.log(slide)
-            $('.canvas-container div').css('display','none');
-            console.log($(slide))
-            console.log($(slide).parent())
-            $(slide).parent().css('display','none')
-        })
-
-        var jsonSlide = JSON.stringify({  data:$('.canvas-container').html() })
+        $('#slideTable div svg').css({border:'none'})
+        $('#cloneSlide'+slideNum).css({border:'solid red'})
+        jsonSlide = JSON.stringify({  data:$('#canvasCon'+slideNum+'').html() });
         socket.emit('saveSlide',pptURL, jsonSlide, slideNum);
+        $('#cloneSlide'+slideNum).click(function(){
+            var clickedSlideMini = $(this).attr('id')
+            var clickedSlideSVG = $(this).children().attr('xlink:href');
+            $('.canvas-container div div').css('display','none');
+            $(clickedSlideSVG).parent().css('display','block');
+            svgContainer = d3.select(clickedSlideSVG)
+            $('#slideTable div svg').css({border:'none'})
+            $('#'+clickedSlideMini).css({border:'solid red'})
+            var str=clickedSlideSVG;
+            slideNum=str.split("#slideSVG")[1];
+        })
         slideSetting();
     });
 
     function slideSetting(){
-
         uploadImageBtn.click(function(e){
             document.getElementById('file-input').onchange = function handleImage(e){
                 var reader = new FileReader();
@@ -223,7 +271,7 @@ $(document).ready(function(){
                         if(drawnObject){
                             drawnObject_class = drawnObject.attr('class');
                             drawnObject_id = drawnObject.attr('id');
-                            object_added(drawnObject_class, drawnObject_id);
+                            object_added(drawnObject_class, drawnObject_id,e);
                         }
                     }
                 }
@@ -233,7 +281,6 @@ $(document).ready(function(){
 
         function drawByClick(e, callback){
             var drawnObject;
-
             if(textboxClickStatus==true){
                 drawnObject = svgContainer.append("text")
                     .attr("x", e.offsetX)
@@ -332,7 +379,7 @@ $(document).ready(function(){
             else if(interArrowClickStatus_2==true){
                 var arrowData = [ { "x": e.offsetX,   "y": e.offsetY},  { "x": e.offsetX+50,  "y": e.offsetY}, { "x": e.offsetX+50,  "y": e.offsetY+15},
                     { "x": e.offsetX+80,  "y": e.offsetY-15}, { "x": e.offsetX+50,  "y": e.offsetY-45}, { "x": e.offsetX+50, "y": e.offsetY-30},
-                    {"x": e.offsetX, "y": e.offsetY-30}, {"x": e.offsetX, "y": e.offsetY-45}, {"x": e.offsetX-30, "y": e.offsetY-15}, {"x" : e.offsetX, "y" : e.offsetY+15}, {"x": e.offsetX, "y": e.offsetY}];
+                    {"x": e.offsetX, "y": e.offsetY-30}, {"x": e.offsetX, "y": e.offsetY-45}, {"x": e.offsetX-30, "y": e.offsetY-15}, {"x" : e.offsetX, "y" : e.offsetY+15}];
                 drawnObject = svgContainer.append("path")
                     .attr("d", lineFunction(arrowData))
                     .attr("stroke", "black")
@@ -375,17 +422,14 @@ $(document).ready(function(){
             if(drawnObject){
                 drawnObject_class = drawnObject.attr('class');
                 drawnObject_id = drawnObject.attr('id');
-                callback(drawnObject_class,drawnObject_id);
+                callback(drawnObject_class,drawnObject_id,e);
             }
 
             $('.canvas').css({ cursor:'default'})
         };
 
 
-        function allFlagFalse(){
-                textboxClickStatus=false, rectClickStatus=false, circleClickStatus=false, triangleClickStatus=false, simpleArrowClickStatus_1=false,
-                simpleArrowClickStatus_2=false, interArrowClickStatus_1=false, interArrowClickStatus_2=false, lineClickStatus=false, lineArrowStatus=false
-        }
+
 
         $('.canvas').mousedown(function(e){
 
@@ -393,15 +437,12 @@ $(document).ready(function(){
                 console.log(e.offsetX, e.offsetY)
                 console.log($('.canvas'))
                drawByClick(e, object_added)
-               allFlagFalse();
         })
-
-
-
         /*
          *      콜백 함수
          */
         function object_added(objectClass, objectID,e){
+            allFlagFalse();
             objectNum++;
             console.log(objectClass)
             console.log(objectID)
@@ -409,11 +450,19 @@ $(document).ready(function(){
 
             // 현재 슬라이드를 클론
             console.log(objectID)
-            console.log(e)
-            var jsonSlide = JSON.stringify({  data:$('.canvas-container').html() })
-            socket.emit('saveSlide',pptURL, jsonSlide);
+            console.log(e.target.id)
 
+            var str= e.target.id
+            slideNum=str.split("slideSVG")[1];
+            console.log(slideNum)
+            var jsonSlide = JSON.stringify({  data:$('#canvasCon'+slideNum+'').html() });
+            socket.emit('saveSlide',pptURL, jsonSlide, slideNum);
         }
+    };
+
+    function allFlagFalse(){
+        textboxClickStatus=false, rectClickStatus=false, circleClickStatus=false, triangleClickStatus=false, simpleArrowClickStatus_1=false,
+            simpleArrowClickStatus_2=false, interArrowClickStatus_1=false, interArrowClickStatus_2=false, lineClickStatus=false, lineArrowStatus=false
     }
 });
 

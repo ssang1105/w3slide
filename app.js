@@ -54,12 +54,11 @@ var PPTSchema = new mongoose.Schema({
         name : String,
         profilePicture: Object,
         email : String,
-        id : String
+        id : String,
+        isLogin : Boolean
     }],
     createdDate : Date,
-    pptContents : [{
-        slide : String
-    }],
+    pptContents : [String],
     thumbnail : String,
     id : String,
     url : String,
@@ -205,11 +204,13 @@ io.sockets.on('connection', function (socket) {
                 for(var j=0; j<pptMembersLength; j++){
                     for(var i=0; i<pptMembersLength; i++)
                         if(user.id==ppt.members[i].id){
+                            ppt.members[i].isLogin=true;
+                            ppt.save();
                             oldUser=true;
                             break;
                         }
                     if(oldUser==false){
-                        ppt.members.push({name : user.username,profilePicture:user.profilePicture,email:user.email,id:user.id});
+                        ppt.members.push({name : user.username,profilePicture:user.profilePicture,email:user.email,id:user.id, isLogin:true});
                         ppt.save();
                         user.projectList.push(ppt);
                         user.save();
@@ -227,19 +228,29 @@ io.sockets.on('connection', function (socket) {
                 var data1 = ('님이 입장하였습니다');
                 io.sockets.in(socket.room).emit('updatechat',username,data1);
                 io.sockets.in(socket.room).emit('userlist', {users :ppt.members,userID :user.id, isSucess :true});
-                socket.emit('userprofilepic',user);
-
             });
         });
     });
 
     socket.on('leaveroom',function(data){
-        console.log('nickname ' + socket.username + ' has been disconnected');
-        var data1 = (socket.username + ' 님이 나가셨습니다.');
-        io.sockets.in(socket.room).emit('updatechat',socket.username,data1);
-        io.sockets.in(socket.room).emit('userlist',{userURL :data.pptURL, userID : data.userID,isSucess:false});
-        socket.leave(socket.room);
+        Users.findOne({'id':data.userID},function(err,user){
+            if(err) throw err;
+            PPTs.findOne({'url':data.pptURL},function(err,ppt){
+                if(err) throw  err;
+                var pptMembersLength =ppt.members.length
+                for(var i=0; i<pptMembersLength; i++)
+                    if(user.id==ppt.members[i].id){
+                        ppt.members[i].isLogin=false;
+                        ppt.save();
+                    }
 
+            console.log('nickname ' + user.username + ' has been disconnected');
+            var data1 = (user.username + ' 님이 나가셨습니다.');
+            io.sockets.in(socket.room).emit('updatechat',user.username,data1);
+            io.sockets.in(socket.room).emit('userlist',{users :ppt.members,userID :user.id, isSucess :false});
+            socket.leave(socket.room);
+            });
+        });
     });
 
 
@@ -269,7 +280,8 @@ io.sockets.on('connection', function (socket) {
                 name : user.username,
                 profilePicture: user.profilePicture,
                 email : user.email,
-                id : user.id
+                id : user.id,
+                isLogin: true
             },
             createdDate : Date.now(),
             thumbnail : pptImg,
@@ -278,7 +290,7 @@ io.sockets.on('connection', function (socket) {
             isNewSlide : true
         });
         console.log(newSlides.id);
-        newSlides.members.push({ name : user.username, profilePicture:user.profilePicture, email:user.email, id:user.id})
+        newSlides.members.push({ name : user.username, profilePicture:user.profilePicture, email:user.email, id:user.id, isLogin:true})
         newSlides.save(function(err){ if(err) throw err; });
         Users.findOne({'id':user.id},function(err,user){
             user.projectList.push(newSlides);
@@ -298,55 +310,29 @@ io.sockets.on('connection', function (socket) {
         })
     });
 
-    socket.on('saveSlide', function(pptURL, jsonSlide, pageNum){
+    socket.on('saveSlide', function(pptURL, jsonSlide, slideNum){
         PPTs.findOne({'url':pptURL}, function(err,ppt){
             if (err) throw err;
             ppt.isNewSlide = false;
 
-            // mongoose array의 특정 index에 jsonSlide를 못넣어.. sub document
-
-            ppt.pptContents.$pop();
-            ppt.pptContents.push({
-                slide: jsonSlide
-            });
+//            ppt.pptContents.$pop();
+//            ppt.pptContents.push({
+//                slide: jsonSlide
+//            });
+//            ppt.save();
+            console.log('slideNum ' + slideNum)
+            ppt.pptContents.set(slideNum-1,jsonSlide);
             ppt.save();
-//
-//                            ppt.pptContents.update(
-//                                {},
-//                                { "$push": {
-//                                    "list": {
-//                                        "$each": [ 1, 2, 3 ],
-//                                        "$position": 0 }
-//                                }
-//                                },function(err,NumAffected) {
-//                                    console.log("done");
-//
-//                                });
-
             console.log('***********')
-//            console.log(ppt.pptContents)
+            for(var i =0; i<ppt.pptContents.length; i++)
+                console.log(ppt.pptContents[i])
             console.log('***********')
-
-//                            ppt.pptContents.set(pageNum, subdoc);
-
-
-
-//                            ppt.pptContents.$pop();
-//                            ppt.pptContents.push({ 'slide' :jsonSlide })
-
-//                            ppt.save();
-//                                push({
-//                                slide : jsonSlide
-//                            });
-//                            ppt.update();
-//                            console.log(ppt.pptContents[0])
         })
     })
     socket.on('getExistSlideSVG', function(pptURL){
-        console.log(pptURL)
         PPTs.findOne({'url':pptURL}, function(err,ppt){
             if(err) throw err;
-            socket.emit('slideSVG',ppt.pptContents[0].slide)
+            socket.emit('slideSVG',ppt.pptContents)
         })
     })
 
@@ -369,9 +355,12 @@ io.sockets.on('connection', function (socket) {
         })
     });
 
-    socket.on('addNewSlide', function(slideNum){
-
-    });
+    socket.on('getAmountSlideNum',function(pptURL){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            if(err) throw err;
+            socket.emit('amountSlideNum',ppt.pptContents.length)
+        })
+    })
 
     socket.on('disconnect', function(){
         console.log("Socket Disconnected");
@@ -380,7 +369,6 @@ io.sockets.on('connection', function (socket) {
     });
 
 });
-
 
 
 

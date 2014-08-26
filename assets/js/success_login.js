@@ -13,9 +13,9 @@ $(document).ready(function(){
 
 
     win.load(function(){
+        logo.css({ left:win.innerWidth()/2-logo.width()/2 })
         socket.emit('getUsersPPT', userID);
         socket.on('userPPT', function(ppt){
-            console.log(ppt)
             // 불러올 PPT가 있을 경우에
             if(ppt){
                 var existingSlides = '<div class="userSlide" id='+ppt.url+' onclick="location.href=\'' + '/' + ppt.url + '\'" style="float:left;"><a href="#"><img src="'+ ppt.thumbnail+'" style=" margin : 20px 20px 0px 20px; width: 170px; height: 170px;" draggable="false">' +
@@ -28,6 +28,7 @@ $(document).ready(function(){
                         // 기존 프로젝트일 때 (일단 파싱 방법이 확정되야됨)
                 })
             }
+
         });
     });
 
