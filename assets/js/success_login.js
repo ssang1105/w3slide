@@ -9,8 +9,9 @@ $(document).ready(function(){
         btn_uploadPPT = $('#uploadPPT'),
         pptLists = $('#pptLists'),
         userID = $('.profilePicture')[0].id,
+        upPPT = $('#upload'),
         isNewSlide
-
+    var url = document.location.host;
 
     win.load(function(){
         logo.css({ left:win.innerWidth()/2-logo.width()/2 })
@@ -23,9 +24,6 @@ $(document).ready(function(){
                 pptLists.append(existingSlides);
                 $('#'+ppt.url).click(function(e){
                 socket.emit('loadExistSlide',ppt.url, userID);
-                // 슬라이드를 클릭하여 slide.ejs로 가면, ppt schema에 저장 되어 있던 PPT 정보, 멤버 띄우기
-                        // 새 프로젝트일 때 (일단 파싱 방법이 확정되야됨.)
-                        // 기존 프로젝트일 때 (일단 파싱 방법이 확정되야됨)
                 })
             }
 
@@ -34,6 +32,9 @@ $(document).ready(function(){
 
     var overlay = $('<div id="overlay"></div>');
     xBtn.click(function(){
+        upPPT.hide();
+        btn_createPPT.show();
+        btn_uploadPPT.show();
         popup.hide();
         overlay.appendTo(document.body).remove();
         return false;
@@ -49,18 +50,26 @@ $(document).ready(function(){
 
 
     btn_uploadPPT.click(function(){
-        isNewSlide=false;
+        isNewSlide='upload';
         console.log('file upload');
-        // 파일 업로드
-        // pptx 파일만 선택 가능하도록
-        // pptLists.append
-        // 서버에 DB 저장 요청
-        popup.hide();
+        btn_uploadPPT.hide();
+        btn_createPPT.hide();
+        upPPT.show();
+        console.log(userID);
+        socket.on("upload_complete", function(data){
+            if(data == "complete"){
+                var pptURL = makeid();
+                socket.emit("uploadPPT_URL", { pptURL : pptURL, isNewSlide : isNewSlide, userID : userID} );
+                url = url + "/" + pptURL;
+                url = "http://"+url;
+                window.location.href = url;
+            }
+        });
         overlay.appendTo(document.body).remove();
     });
 
     btn_createPPT.click(function(){
-        isNewSlide=true
+        isNewSlide='new'
         socket.emit('createSlide', userID, isNewSlide);
         popup.hide();
         overlay.appendTo(document.body).remove();

@@ -19,6 +19,13 @@ var methodOverride = require('method-override');
 var errorhandler = require('errorhandler');
 var cookieParser = require('cookie-parser')
 var socketio = require('socket.io');
+var nodemailer = require('nodemailer');
+
+///woong
+var unzip = require('unzip');
+var SocketIOFileUpload = require('socketio-file-upload');
+var readdir = require('./modules/search.js');
+var load = require('./modules/load.js');
 
 app.use(cookieParser());
 app.use(session({ secret: 'your secret here' }));
@@ -62,7 +69,8 @@ var PPTSchema = new mongoose.Schema({
     thumbnail : String,
     id : String,
     url : String,
-    isNewSlide : Boolean
+    isNewSlide : String,
+    objectNum : Number
 })
 
 var PPTs = mongoose.model('ppts', PPTSchema);
@@ -192,7 +200,82 @@ mongoose.connect('mongodb://localhost/mydb',function(err){
 
 io.sockets.on('connection', function (socket) {
     console.log('Socket Connected');
+
+    ///////////////// upload start //////////////
+    var uploader = new SocketIOFileUpload();
+    uploader.dir = __dirname+"/upload/";
+    uploader.listen(socket);
+
+    uploader.on("saved", function(event){
+        //console.log(event.file.name);
+        var tmp = uploader.dir
+        var nn_file = tmp + event.file.name;
+        var n_file = event.file.name.replace('pptx', 'zip');
+        var n_name = event.file.name.split('.pptx').join("");
+        var nnn_file = tmp + n_file;
+        var e_sld;
+
+        fs.rename(nn_file, nnn_file , function(err){
+            if(err) throw err;
+            console.log('rename complete');
+            fs.exists(nnn_file, function(exists){
+                if(exists){
+                    setTimeout(function(){
+                        fs.createReadStream(tmp+ n_file).pipe(unzip.Extract({ path: tmp +n_name+'/' }));
+                        console.log("unzip complete");
+                    }, 1000);
+                    setTimeout(function(){
+                        var search = new readdir();
+                        var loadx = new load();
+                        var abc = loadx.load_pxml(tmp+n_name+'/ppt/presentation.xml');		//presentation.xml 가져오기
+                        e_sld = search.search_detail(tmp+n_name+'/ppt/slides/_rels/', abc);
+
+                        socket.emit("upload_complete", "complete");
+                        socket.on("uploadPPT_URL", function(data){
+                            var pptName = event.file.name;
+                            var users = data.userID;
+                            var pptURL = data.pptURL;
+                            var isNewSlide = data.isNewSlide;
+                            var pptImg = "./assets/image/index/samplePPT.png";
+                            Users.findOne({'id': users},function(err,user){
+                                var newSlides = new PPTs({
+                                    fileName : pptName,
+                                    members : {
+                                        name : user.username,
+                                        profilePicture: user.profilePicture,
+                                        email : user.email,
+                                        id : user.id,
+                                        isLogin: true
+                                    },
+                                    createdDate : Date.now(),
+                                    thumbnail : pptImg,
+                                    id : user.id+user.projectNum+pptName,
+                                    url : pptURL,
+                                    isNewSlide : 'upload'
+                                });
+                                console.log(newSlides.id);
+                                newSlides.members.push({ name : user.username, profilePicture:user.profilePicture, email:user.email, id:user.id, isLogin:true})
+                                newSlides.save(function(err){ if(err) throw err; });
+                                user.projectList.push(newSlides);
+                                user.save();
+                                app.get('/'+pptURL, ensureAuthenticated, function(req, res){
+                                    tempSld = JSON.stringify(e_sld)
+                                    res.render('slide', { pptURL:pptURL , uploadPPTData:tempSld});
+                                });
+                            });
+                        });
+                    }, 2200);
+                }
+            });
+        });
+    });
+
+    uploader.on("error", function(event){
+        console.log("Error from uploader", event);
+    });
+
     //==========================chat!!====================================
+
 
     socket.on('joinroom',function(data){
         Users.findOne({'id':data.userID},function(err,user){
@@ -259,6 +342,41 @@ io.sockets.on('connection', function (socket) {
     });
 
     //==========================chat!!==================================== //
+//-----------------------------send mail!!!!--------------------------
+    socket.on('send_mail',function(data,presenturl,userID){
+        Users.findOne({id:userID},function(err,user){
+            if(err) throw err;
+            var transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: 'genasix1@gmail.com',
+                    pass: 'gksdnfl2'
+                }
+            });
+            var mailOptions = {
+                from: '<genamsix1@gmail.com>', // sender address
+                to: ''+data, // list of receivers
+                subject: ''+user.username+'님께서 W3에 초대 하셨습니다!', // Subject line
+                text: ''+presenturl, // plaintext body
+                html: '<b>'+presenturl+'</b>' // html body
+            };
+
+            transporter.sendMail(mailOptions, function(error, info){
+                if(error){
+                    console.log(error);
+                }else{
+                    console.log('Message sent: ' + info.response);
+                }
+                if(!error)
+                {
+                    socket.emit('Sucessmail',data);
+                }
+            });
+            console.log(data)
+
+        })
+    })
+//---------------------------send mail.end------------------------------
 
     socket.on('createSlide', function(userID, isNewSlide){
         Users.findOne({'id':userID},function(err,user){
@@ -287,7 +405,8 @@ io.sockets.on('connection', function (socket) {
             thumbnail : pptImg,
             id : user.id+user.projectNum+pptName,
             url : pptURL,
-            isNewSlide : true
+            isNewSlide : 'new',
+            objectNum:0
         });
         console.log(newSlides.id);
         newSlides.members.push({ name : user.username, profilePicture:user.profilePicture, email:user.email, id:user.id, isLogin:true})
@@ -298,7 +417,7 @@ io.sockets.on('connection', function (socket) {
                 if(err) throw err;
             });
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-                res.render('slide', { pptURL:pptURL });
+                res.render('slide', { pptURL:pptURL , uploadPPTData: 'notUploadPPT'});
             });
         });
     });
@@ -310,23 +429,29 @@ io.sockets.on('connection', function (socket) {
         })
     });
 
+    socket.on('saveUploadSlide', function(pptURL, jsonSlide, slideNum){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            if (err) throw err;
+            ppt.pptContents.set(slideNum-1,jsonSlide);
+            ppt.save();
+        })
+    })
+
     socket.on('saveSlide', function(pptURL, jsonSlide, slideNum){
         PPTs.findOne({'url':pptURL}, function(err,ppt){
             if (err) throw err;
-            ppt.isNewSlide = false;
-
-//            ppt.pptContents.$pop();
-//            ppt.pptContents.push({
-//                slide: jsonSlide
-//            });
-//            ppt.save();
-            console.log('slideNum ' + slideNum)
+            ppt.isNewSlide = 'old';
             ppt.pptContents.set(slideNum-1,jsonSlide);
             ppt.save();
-            console.log('***********')
-            for(var i =0; i<ppt.pptContents.length; i++)
-                console.log(ppt.pptContents[i])
-            console.log('***********')
+        })
+    })
+
+    socket.on('delSlide',function(pptURL,slideNum){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            if (err) throw err;
+            console.log('slideNum ' + slideNum)
+            ppt.pptContents.set(slideNum-1,"");
+            ppt.save();
         })
     })
     socket.on('getExistSlideSVG', function(pptURL){
@@ -350,7 +475,7 @@ io.sockets.on('connection', function (socket) {
         Users.findOne({'id':userID},function(err,user){
             if(err) throw err;
             app.get('/'+pptURL, ensureAuthenticated, function(req, res){
-                res.render('slide', { pptURL:pptURL });
+                res.render('slide', { pptURL:pptURL , uploadPPTData: 'notUploadPPT'});
             });
         })
     });
@@ -360,7 +485,61 @@ io.sockets.on('connection', function (socket) {
             if(err) throw err;
             socket.emit('amountSlideNum',ppt.pptContents.length)
         })
+    });
+
+    socket.on('addObject',function(pptURL, obj, slideNum, userID){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            ppt.objectNum++;
+            ppt.save();
+            socket.broadcast.to(pptURL).emit('addedObject',obj, slideNum, userID, ppt.objectNum);
+        })
+
+
     })
+    socket.on('addSlide' ,function(pptURL, slideNum, userID){
+        socket.broadcast.to(pptURL).emit('addedSlide',slideNum, userID);
+    })
+
+    socket.on('getObjectNum', function(pptURL){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            socket.emit('objectNum', ppt.objectNum);
+        })
+    })
+    socket.on('getObjectNumforEvent', function(pptURL){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            socket.emit('objectNumforEvent', ppt.objectNum);
+        })
+    })
+    socket.on('slideClick', function(pptURL, slideNum, userID){
+        Users.findOne({'id':userID},function(err,user){
+            if(err) throw err;
+            socket.broadcast.to(pptURL).emit('slideClicked',slideNum, userID, user.username);
+        })
+    })
+    socket.on('isUploadPPT',function(pptURL){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            ppt.isNewSlide='old'
+            ppt.save();
+        })
+    })
+    socket.on('saveObjNum',function(pptURL,objectNum){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            ppt.objectNum = objectNum;ㅇ
+            ppt.save();
+        })
+    })
+    socket.on('slideStatus',function(pptURL, slideStatus){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            ppt.isNewSlide = slideStatus;
+            ppt.save();
+        })
+    })
+    socket.on('modifiedObject', function(userID, pptURL, objectID, newStyle){
+        PPTs.findOne({'url':pptURL}, function(err,ppt){
+            console.log('asdf')
+            socket.broadcast.to(pptURL).emit('updateObject', userID, objectID, newStyle);
+        })
+    });
 
     socket.on('disconnect', function(){
         console.log("Socket Disconnected");
@@ -370,8 +549,16 @@ io.sockets.on('connection', function (socket) {
 
 });
 
-
-
 /*
-    서버가 켜지면 PPT Schema에 있는 pptURL들을 모두를 열어
+ *    서버가 켜지면 PPT Schema에 있는 pptURL들을 모두를 열
  */
+PPTs.find({}, function(err, ppts) {
+    ppts.forEach(function(ppt) {
+        app.get('/'+ppt.url, ensureAuthenticated, function(req, res){
+            res.render('slide', { pptURL:pptURL , uploadPPTData:tempSld});
+        });
+    });
+});
+
+
+

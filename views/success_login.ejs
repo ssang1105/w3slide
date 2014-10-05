@@ -4,10 +4,24 @@
     <title>WWW Slides </title>
     <script type="text/javascript" src="http://localhost:3000/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.js"></script>
+
     <script src="../assets/js/header.js"></script>
+    <script src="../assets/js/upload_client.js"></script>
     <script src="../assets/js/socket.js"></script>
     <script src="../assets/js/success_login.js"></script>
     <link rel="stylesheet" href="../assets/css/style.css" />
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function(){
+//            var siofu = new SocketIOFileUpload(socket);
+//            var siofu = new SocketIOFileUpload(socket);
+            // Configure the three ways that SocketIOFileUpload can read files:
+            //document.getElementById("upload_btn").addEventListener("click", siofu.prompt, false);
+            siofu.listenOnInput(document.getElementById("upload_input"));
+            siofu.listenOnDrop(document.getElementById("file_drop"));
+
+            // Do something when a file is uploaded:
+        }, false);
+    </script>
 </head>
 
 <body>
@@ -27,6 +41,10 @@
         <img src='../assets/image/index/x.png' alt='quit' class='x' id='x' />
         <a href="#"><img src='../assets/image/index/uploadPPT.png'  id="uploadPPT" class="newSlide" style="margin-left:20px; width: 40%;" /></a>
         <a href="#"><img src='../assets/image/index/createPPT.png'  id="createPPT" class="newSlide" style="margin-left:5px; width: 40%;" /></a>
+        <div id='upload' style="width:100%;  display:none;">
+            <div id="file_drop" dropzone="copy" title="drop files for upload" style="width:100%;  border:1px dashed; margin:0 auto; font-size:20px;">Drag & Drop File</div>
+            <p><label>Choose File: <input type="file" id="upload_input"/></label></p>
+        </div>
     </div>
 </div>
 <div id="createSlides"><a href><img id="createSlidesBtn" src="assets/image/index/newSlides.png" style="width: 30%"></a></div>
@@ -37,4 +55,3 @@
 
 </body>
 </html>
-

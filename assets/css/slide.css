@@ -21,28 +21,27 @@ header{
 }
 .background{
     background: #6f6f6f;
-    width: 100%;
-    height: 100%;
-
+    height: auto;
+    width :1410px;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
 }
 
-.canvas-container{
+.canvas-wrapper{
     width:1330px;
-    height:530px;
+    height:650px;
     background: #D6D6D6;
     padding:40px;
 }
 
-.canvas{
-    width:950px;
-    height:534px;
-    background: white;
-    margin-left: 210px;
-}
+/*.canvas{*/
+    /*width:950px;*/
+    /*height:534px;*/
+    /*background: white;*/
+    /*margin-left: 210px;*/
+/*}*/
 
 /****************************************************
                     상단 툴 바 CSS
@@ -63,7 +62,7 @@ header{
 }
 .PPTtool1 img{
     width: 100px;
-    float:left;   
+    float:left;
 }
 .PPTtool1 img:hover{
     opacity: 0.3;
@@ -196,7 +195,7 @@ header{
     margin-left: -270px;
     margin-top:0.5%;
     margin-right: 5%;
-    height: 759px;
+    height: 900px;
 }
 .sidebar-toggle {
     position: absolute;
@@ -305,3 +304,192 @@ header{
 
 
 
+/*
+        Popup
+*/
+/*//-----------------Invite by Email popup end---------------------------*/
+#popup_box {
+    display:none; /* Hide the DIV */
+    position:fixed;
+    _position:absolute; /* hack for internet explorer 6 */
+    width:250px;
+    height:100px;
+    background:#494949;
+    left: 80px;
+    top: 250px;
+    z-index:100; /* Layering ( on-top of others), if you have lots of layers: I just maximized, you can change it yourself */
+    /*margin-left: 15px;*/
+
+    /* additional features, can be omitted */
+    border:2px solid #202020;
+    padding:15px;
+    font-size:15px;
+    box-shadow: 0 0 5px #202020;
+
+}
+#mail{
+    line-height:15px;
+    right:7%;
+    top:45px;
+    position:absolute;
+    font-weight:500;
+    width: 15%;
+    height: 25%;
+
+}
+#inputEmail{
+    line-height:15px;
+    top:62px;
+    left: 10px;
+    position:absolute;
+    font-weight:500;
+    width: 65%;
+    height: 15%;
+}
+#popupBoxClose{
+    float: right;
+    right: 50px;
+    width: 8%;
+    height: 17%;
+}
+#popuplogo{
+    right:50%;
+    top:1%;
+    position:absolute;
+    width: 50%;
+    height: 20%;
+    color:white
+}
+#popupText{
+    line-height:15px;
+    right:10px;
+    top:85px;
+    position:absolute;
+    font-weight:500;
+    color:white
+}
+
+/* This is for the positioning of the Close Link */
+/*//-----------------Invite by Email popup end---------------------------*/
+/*//-----------------slideShow popup---------------------------*/
+#slideShowBoxClose {
+    float: right;
+    width: 30px;
+    height: 30px;
+    right:10px;
+    top:5px;
+    position:absolute;
+    color:#6fa5e2;
+    font-weight:500;
+}
+/*//-------------수정부분*/
+#slideShowBox{
+    display:none; /* Hide the DIV */
+    position:absolute;
+    /*_position:absolute;  hack for internet explorer 6 */
+    width: 1366px;
+    height: 800px;
+    background:#ffffff;
+    left: 0px;
+    top: 0px;
+    /*z-index:100; *//* Layering ( on-top of others), if you have lots of layers: I just maximized, you can change it yourself */
+    margin-left: 135px;
+    margin-right: 2px;
+
+    /* additional features, can be omitted */
+    border:2px solid #202020;
+    padding:2px;
+    font-size:15px;
+    box-shadow: 0 0 5px #202020;
+}
+/*------------------수정 끝*/
+#slider {
+    display: block;
+    position: relative;
+    z-index: 9;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto; }
+
+#button-previous {
+    position: relative;
+    left: 10px;
+    margin-top: 40%;
+    width: 40px;
+    height: 60px;
+    z-index: 99999;}
+
+#button-next {
+    position: relative;
+    margin-top: 40%;
+    float: right;
+    right: 10px;
+    width: 40px;
+    height: 60px;
+    z-index: 99999;}
+
+.sp {
+    position: absolute; }
+
+#slider .sp {
+    margin-top: 50px;
+    width: 100%;
+    height: auto; }
+/*//-----------------slideShow popup---------------------------*/
+
+/*//-----------------animation popup---------------------------*/
+#animation_popup_box{
+    text-align: center;
+    display:none; /* Hide the DIV */
+    position:absolute; /* hack for internet explorer 6 */
+    width:350px;
+    height:80px;
+    /*background:#494949;*/
+    left: 900px;
+    top: 150px;
+    z-index:100; /* Layering ( on-top of others), if you have lots of layers: I just maximized, you can change it yourself */
+    margin-left: 15px;
+    border:2px solid #202020;
+    padding:15px;
+    font-size:15px;
+    box-shadow: 0 0 5px #202020;
+}
+#speed_option{
+    color: #ffffff;
+    left : 0px;
+    height: 40;
+    background: #202020;
+}
+#animation_option{
+
+
+}
+#animation_popupBox_Close{
+    width: 30px;
+    height: 30px;
+    right:0px;
+    top:0px;
+    position:absolute;
+    color:#6fa5e2;
+
+}
+#animation_option div{
+
+    float: left;
+    margin-right: 5px;
+    margin-left: 5px;
+
+}
+#animation_option div img{
+
+    margin-left: 20px;
+    margin-right: 30px;
+    width: 50px;
+    height: 50px;
+}
+/*//-----------------animation popup---------------------------*/
+
+/* fabric */
+canvas{
+    margin-left: 140px;
+}

@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>WWW Slides</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
+    <script type="text/javascript" src="http://interactjs.io/js/interact.min.js"></script>
     <script type="text/javascript" src="http://localhost:3000/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../assets/js/fabric.js"></script>
     <script type="text/javascript" src="../assets/js/sidebar.js"></script>
     <script type="text/javascript" src="../assets/js/socket.js"></script>
     <script type="text/javascript" src="../assets/js/header.js"></script>
     <script type="text/javascript" src="../assets/js/slide.js"></script>
     <link rel="stylesheet" href="../assets/css/slide.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=euc-kr">
 </head>
 <body>
 
@@ -18,14 +23,14 @@
         <div class="slidelist">
             <img src="../assets/image/slide/sidebar/toggleBtn_1.png" id="sidebarBtn">
             <div id="slideTable">
-                <!--슬라이드의 갯수를 받아와 슬라이드 이미지를 동적으로 뿌려주자-->
+                <!--????????? ?????? ???? ??????? ??????? ???????? ???????-->
             </div>
 
         </div>
 
         <div class="chat">
             <div id="userList">
-                <!--추가 됨-->
+                <!--??? ??-->
             </div>
             <div id="chatRoom"></div>
             <div id="chatMessage">
@@ -38,65 +43,98 @@
                 <img class="sub_tool" id="exportBtn" src="../assets/image/slide/sidebar/export.png">
                 <img class="sub_tool" id="inviteBtn"  src="../assets/image/slide/sidebar/invite_user.png">
                 <img class="sub_tool" id="slideshowtBtn"  src="../assets/image/slide/sidebar/slideshow.png">
+                <div id="popup_box">
+                    <img class="sub_tool" id="popupBoxClose"  src="../assets/image/index/x.png">
+                    <img class="sub_tool" id="popuplogo"  src="../assets/image/index/logo.png">
+                    <input type="text" id="inputEmail" >
+                    <img class="sub_tool" id="mail"  src="../assets/image/slide/sidebar/mail_write.png">
+                    <p id="popupText">Invite by Email</p>
+                </div>
+                <div id="slideShowBox">
+                    <img class="sub_tool" id="slideShowBoxClose"  src="../assets/image/index/x.png">
+                    <div id="slider">
+                        <!--<div class="sp"></div>-->
+                        <!--<img class="sp" src="../assets/image/slide-1.jpg" id="1">-->
+                        <!--<img class="sp" src="../assets/image/slide-2.jpg" id="2">-->
+                        <!--<img class="sp" src="../assets/image/slide-3.jpg" id="3">-->
+                    </div>
+                    <img id="button-previous" src="../assets/image/arrow-prev.png">
+                    <img id="button-next" src="../assets/image/arrow-next.png">
+                </div>
             </div>
+
         </div>
     </div>
 </div>
 <div class = "background">
     <header>
+        <div style="display: none" class="tempPPT" id="<%=uploadPPTData%>"></div>
         <div id="logo"  class="<%=pptURL%>"><a href><img src="../assets/image/index/logo.png" style="width:60%"></a></div>
         <div style="float: right;  background: #969696; min-width: 190px; max-height: 48px">
             <p id="namespace"></p>
             <img src=" " class="profilePicture"></div>
     </header>
     <div class="toolmenu">
-            <div class="PPTtool1" draggable="false">
-                <img src="../assets/image/slide/toolbar/add_slide.png" id="addSlide" draggable="false">
-                <img src="../assets/image/slide/toolbar/del_slide.png" id="delSlide" draggable="false">
+        <div class="PPTtool1" draggable="false">
+            <img src="../assets/image/slide/toolbar/add_slide.png" id="addSlide" draggable="false">
+            <img src="../assets/image/slide/toolbar/del_slide.png" id="delSlide" draggable="false">
+        </div>
+        <div class="division_line" draggable="false"></div>
+        <div class="PPTtool2" draggable="false">
+            <div id="font"></div> <div id="font-size"></div>
+            <div id="font-feature">
+                <img src="../assets/image/slide/toolbar/font_bold.png" id="font-bold" draggable="false">
+                <img src="../assets/image/slide/toolbar/font_incline.png" id="font-incline" draggable="false">
+                <img src="../assets/image/slide/toolbar/font_underline.png" id="font-underline" draggable="false" >
+                <img src="../assets/image/slide/toolbar/font_default.png" id="font-color" draggable="false">
             </div>
-            <div class="division_line" draggable="false"></div>
-            <div class="PPTtool2" draggable="false">
-                <div id="font"></div> <div id="font-size"></div>
-                <div id="font-feature">
-                    <img src="../assets/image/slide/toolbar/font_bold.png" id="font-bold" draggable="false">
-                    <img src="../assets/image/slide/toolbar/font_incline.png" id="font-incline" draggable="false">
-                    <img src="../assets/image/slide/toolbar/font_underline.png" id="font-underline" draggable="false" >
-                    <img src="../assets/image/slide/toolbar/font_default.png" id="font-color" draggable="false">
+            <div id="text-align">
+                <img src="../assets/image/slide/toolbar/align_right.png" id="alignRight" draggable="false">
+                <img src="../assets/image/slide/toolbar/align_center.png" id="alignCenter" draggable="false">
+                <img src="../assets/image/slide/toolbar/align_left.png" id="alignLeft" draggable="false">
+            </div>
+        </div>
+        <div class="division_line"></div>
+        <div class="PPTtool3" draggable="false">
+            <img src="../assets/image/slide/toolbar/textbox.png" id="textbox">
+            <img src="../assets/image/slide/toolbar/rect.png" id="rect" >
+            <img src="../assets/image/slide/toolbar/circle.png" id="circle" >
+            <img src="../assets/image/slide/toolbar/triangle.png" id="triangle">
+            <img src="../assets/image/slide/toolbar/arrow_figure_1.png" id="simple_arrow1">
+            <img src="../assets/image/slide/toolbar/arrow_figure_2.png" id="simple_arrow2">
+            <img src="../assets/image/slide/toolbar/arrow_inter_1.png" id="inter_arrow1">
+            <img src="../assets/image/slide/toolbar/arrow_inter_2.png" id="inter_arrow2">
+            <img src="../assets/image/slide/toolbar/line.png" id="line" style=" margin-top:14px; margin-right:7px; width:29px; height: 4px;">
+            <img src="../assets/image/slide/toolbar/arrow_line.png" id="line_arrow">
+        </div>
+        <div class="division_line"></div>
+        <div class="PPTtool4">
+            <img src="../assets/image/slide/toolbar/table.png" id="table">
+            <div class="image-upload">
+                <label for="file-input">
+                    <img src="../assets/image/slide/toolbar/uploadImage.png" id="uploadImage">
+                </label>
+                <input id="file-input" type="file" accept="image/*" style="display:none"/>
+            </div>
+            <img src="../assets/image/slide/toolbar/animation.png" id="animation">
+            <div id="animation_popup_box">
+                <img class="sub_tool" id="animation_popupBox_Close"  src="../assets/image/index/x.png">
+                <div id="animation_option">
+                    <div><img src="../assets/image/slide/toolbar/pushl.png" id="animation_pushl">
+                        <p>Push from Left</p>
+                    </div>
+                    <div><img src="../assets/image/slide/toolbar/appear.png" id="animation_appear" data-value="">
+                        <p>Appear</p>
+                    </div>
+                    <div><img src="../assets/image/slide/toolbar/pushr.png" id="animation_pushr">
+                        <p>Push from Right</p>
+                    </div>
                 </div>
-                <div id="text-align">
-                    <img src="../assets/image/slide/toolbar/align_right.png" id="alignRight" draggable="false">
-                    <img src="../assets/image/slide/toolbar/align_center.png" id="alignCenter" draggable="false">
-                    <img src="../assets/image/slide/toolbar/align_left.png" id="alignLeft" draggable="false">
-                </div>
             </div>
-            <div class="division_line"></div>
-            <div class="PPTtool3" draggable="false">
-                <img src="../assets/image/slide/toolbar/textbox.png" id="textbox">
-                <img src="../assets/image/slide/toolbar/rect.png" id="rect" >
-                <img src="../assets/image/slide/toolbar/circle.png" id="circle" >
-                <img src="../assets/image/slide/toolbar/triangle.png" id="triangle">
-                <img src="../assets/image/slide/toolbar/arrow_figure_1.png" id="simple_arrow1">
-                <img src="../assets/image/slide/toolbar/arrow_figure_2.png" id="simple_arrow2">
-                <img src="../assets/image/slide/toolbar/arrow_inter_1.png" id="inter_arrow1">
-                <img src="../assets/image/slide/toolbar/arrow_inter_2.png" id="inter_arrow2">
-                <img src="../assets/image/slide/toolbar/line.png" id="line" style=" margin-top:14px; margin-right:7px; width:29px; height: 4px;">
-                <img src="../assets/image/slide/toolbar/arrow_line.png" id="line_arrow">
-            </div>
-            <div class="division_line"></div>
-            <div class="PPTtool4">
-                <img src="../assets/image/slide/toolbar/table.png" id="table">
-                <div class="image-upload">
-                    <label for="file-input">
-                        <img src="../assets/image/slide/toolbar/uploadImage.png" id="uploadImage">
-                    </label>
-                    <input id="file-input" type="file" accept="image/*" style="display:none"/>
-                </div>
-                <img src="../assets/image/slide/toolbar/animation.png" id="animation">
-            </div>
+        </div>
     </div>
 </div>
-    <div class="canvas-container">
-
+    <div class="canvas-wrapper">
     </div>
 
 </body>
